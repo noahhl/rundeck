@@ -7,9 +7,11 @@ provisioner:
 
 platforms:
   - name: ubuntu-12.04
+    run_list:
+    - recipe[apt]
+  #- name: centos-6.4
 
 suites:
-  - name: default
-    run_list:
-      - recipe[rundeck::default]
-    attributes:
+- name: default
+  run_list:
+  - recipe[rundeck]
