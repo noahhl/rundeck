@@ -19,9 +19,12 @@
 #
 
 default['rundeck']['version'] = nil # Use latest by default
+default['rundeck']['launcher_url'] = 'https://download.rundeck.org/jar/rundeck-launcher-%{version}.jar'
+default['rundeck']['path'] = '/var/lib/rundeck'
 default['rundeck']['config_path'] = '/etc/rundeck'
-default['rundeck']['lib_path'] = '/var/lib/rundeck'
 default['rundeck']['log_path'] = '/var/log/rundeck'
+default['rundeck']['user'] = 'rundeck'
+default['rundeck']['group'] = 'rundeck'
 
 # Framework configuration
 default['rundeck']['node_name']     = node.name

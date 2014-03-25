@@ -25,17 +25,18 @@ class Chef
 
     attribute(:node_name, kind_of: String, name_attribute: true)
     attribute(:version, kind_of: String, default: lazy { node['rundeck']['version'] })
+    attribute(:launcher_url, kind_of: String, default: lazy { node['rundeck']['launcher_url'] })
     # Paths
+    attribute(:path, kind_of: String, default: lazy { node['rundeck']['path'] })
     attribute(:config_path, kind_of: String, default: lazy { node['rundeck']['config_path'] })
-    attribute(:lib_path, kind_of: String, default: lazy { node['rundeck']['lib_path'] })
     attribute(:log_path, kind_of: String, default: lazy { node['rundeck']['log_path'] })
     # Configuration templates
     attribute(:log4j_config, template: true, default_source: 'log4j.properties.erb')
     attribute(:jaas_config, template: true, default_source: 'jaas-loginmodule.conf.erb')
     attribute(:enable_default_acls, equal_to: [true, false], default: true)
-    # attribute(:url, kind_of: String, default: lazy { provider.default_url })
-    attribute(:user, kind_of: String, default: 'rundeck')
-    attribute(:group, kind_of: String, default: 'rundeck')
+    # Config options
+    attribute(:user, kind_of: String, default: lazy { node['rundeck']['user'] })
+    attribute(:group, kind_of: String, default: lazy { node['rundeck']['group'] })
     attribute(:port, kind_of: [String, Integer], default: lazy { node['rundeck']['port'] })
     attribute(:log4j_port, kind_of: [String, Integer], default: lazy { node['rundeck']['log4j_port'] })
     attribute(:public_rss, equal_to: [true, false], default: lazy { node['rundeck']['public_rss'] })
@@ -43,8 +44,8 @@ class Chef
 
     def after_created
       super
-      # Interpolate the version into the URL
-      # url(url % {version: version})
+      # Interpolate the version into the launcher download URL
+      launcher_url(launcher_url % {version: version})
     end
 
     def provider_for_action(*args)
@@ -67,9 +68,7 @@ class Chef
         notifying_block do
           create_group
           create_user
-          create_config_directory
-          create_lib_directory
-          create_log_directory
+          create_directories
           install_java
           install_rundeck
           write_configs
@@ -87,35 +86,31 @@ class Chef
 
     def create_user
       user new_resource.user do
-        comment "Rundeck service user for #{new_resource.lib_path}"
+        comment "Rundeck service user for #{new_resource.path}"
         gid new_resource.group
         system true
         shell '/bin/false'
-        home new_resource.lib_path
+        home new_resource.path
       end
     end
 
-    def create_config_directory
-      directory new_resource.config_path do
-        owner new_resource.user
-        group new_resource.group
-        mode '700'
-      end
-    end
-
-    def create_lib_directory
-      directory new_resource.lib_path do
-        owner new_resource.user
-        group new_resource.group
-        mode '700'
-      end
-    end
-
-    def create_log_directory
-      directory new_resource.log_path do
-        owner new_resource.user
-        group new_resource.group
-        mode '700'
+    def create_directories
+      [
+        [new_resource.path],
+        [new_resource.config_path],
+        [new_resource.log_path],
+        [new_resource.path, 'projects'],
+        [new_resource.path, 'var'],
+        [new_resource.path, 'var', 'tmp'],
+        [new_resource.path, 'libext'],
+        [new_resource.path, 'data'],
+        [new_resource.path, '.ssh'],
+      ].each do |path|
+        directory ::File.join(*path) do
+          owner new_resource.user
+          group new_resource.group
+          mode '700'
+        end
       end
     end
 
@@ -124,7 +119,7 @@ class Chef
     end
 
     def install_rundeck
-      raise NotImplementedError, "Jar install not written"
+      raise NotImplementedError, "Jar launcher install not written"
     end
 
     def write_configs

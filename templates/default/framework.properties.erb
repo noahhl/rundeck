@@ -1,0 +1,36 @@
+# framework.properties -
+#
+
+# ----------------------------------------------------------------
+# Rundeck server connection information
+# ----------------------------------------------------------------
+
+framework.server.name = localhost
+framework.server.hostname = localhost
+framework.server.port = 4440
+framework.server.url = http://localhost:4440
+# Username/password used by CLI tools are not set.
+
+# ----------------------------------------------------------------
+# Installation locations
+# ----------------------------------------------------------------
+
+rdeck.base = <%= @new_resource.path %>
+
+framework.projects.dir = <%= ::File.join(@new_resource.path, 'projects') %>
+framework.etc.dir = <%= @new_resource.config_path %>
+framework.var.dir = <%= ::File.join(@new_resource.path, 'var') %>
+framework.tmp.dir = <%= ::File.join(@new_resource.path, 'var', 'tmp') %>
+framework.logs.dir = <%= @new_resource.log_path %>
+framework.libext.dir = <%= ::File.join(@new_resource.path, 'libext') %>
+
+# ----------------------------------------------------------------
+# SSH defaults for node executor and file copier
+# ----------------------------------------------------------------
+
+framework.ssh.keypath = <%= ::File.join(@new_resource.path, '.ssh', 'id_rsa') %>
+framework.ssh.user = rundeck
+
+# ssh connection timeout after a specified number of milliseconds.
+# "0" value means wait forever.
+framework.ssh.timeout = 0
