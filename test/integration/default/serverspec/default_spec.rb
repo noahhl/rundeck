@@ -32,4 +32,14 @@ describe 'Configuration' do
   describe file('/etc/rundeck/apitoken.aclpolicy') do
     it { should be_a_file }
   end
+
+  describe file('/etc/rundeck/framework.properties') do
+    it { should be_a_file }
+  end
+end
+
+describe 'Service' do
+  describe file('/etc/service/rundeck') do
+    it { should be_a_directory }
+  end
 end

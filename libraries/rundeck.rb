@@ -26,6 +26,7 @@ class Chef
     attribute(:node_name, kind_of: String, name_attribute: true)
     attribute(:version, kind_of: String, default: lazy { node['rundeck']['version'] })
     attribute(:launcher_url, kind_of: String, default: lazy { node['rundeck']['launcher_url'] })
+    attribute(:service_name, kind_of: String, default: 'rundeck')
     # Paths
     attribute(:path, kind_of: String, default: lazy { node['rundeck']['path'] })
     attribute(:config_path, kind_of: String, default: lazy { node['rundeck']['config_path'] })
@@ -33,6 +34,9 @@ class Chef
     # Configuration templates
     attribute(:log4j_config, template: true, default_source: 'log4j.properties.erb')
     attribute(:jaas_config, template: true, default_source: 'jaas-loginmodule.conf.erb')
+    attribute(:profile_config, template: true, default_source: 'profile.erb')
+    attribute(:framework_config, template: true, default_source: 'framework.properties.erb')
+    attribute(:rundeck_config, template: true, default_source: 'rundeck-config.properties.erb')
     attribute(:enable_default_acls, equal_to: [true, false], default: true)
     # Config options
     attribute(:user, kind_of: String, default: lazy { node['rundeck']['user'] })
@@ -72,6 +76,7 @@ class Chef
           install_java
           install_rundeck
           write_configs
+          configure_service
         end
       end
     end
@@ -125,6 +130,9 @@ class Chef
     def write_configs
       write_log4j_config
       write_jaas_config
+      write_profile_config
+      write_framework_config
+      write_rundeck_config
       write_default_acls if new_resource.enable_default_acls
     end
 
@@ -134,6 +142,7 @@ class Chef
         group new_resource.group
         mode '600'
         content new_resource.log4j_config_content
+        notifies :restart, new_resource
       end
     end
 
@@ -143,6 +152,37 @@ class Chef
         group new_resource.group
         mode '600'
         content new_resource.jaas_config_content
+        notifies :restart, new_resource
+      end
+    end
+
+    def write_profile_config
+      file ::File.join(new_resource.config_path, 'profile') do
+        owner new_resource.user
+        group new_resource.group
+        mode '600'
+        content new_resource.profile_config_content
+        notifies :restart, new_resource
+      end
+    end
+
+    def write_framework_config
+      file ::File.join(new_resource.config_path, 'framework.properties') do
+        owner new_resource.user
+        group new_resource.group
+        mode '600'
+        content new_resource.framework_config_content
+        notifies :restart, new_resource
+      end
+    end
+
+    def write_rundeck_config
+      file ::File.join(new_resource.config_path, 'rundeck-config.properties') do
+        owner new_resource.user
+        group new_resource.group
+        mode '600'
+        content new_resource.rundeck_config_content
+        notifies :restart, new_resource
       end
     end
 
@@ -159,12 +199,24 @@ class Chef
         cookbook 'rundeck'
       end
     end
+
+    def configure_service
+      include_recipe 'runit'
+
+      runit_service new_resource.service_name do
+        cookbook 'rundeck'
+        run_template_name 'rundeck'
+        log_template_name 'rundeck'
+        options new_resource: new_resource
+      end
+    end
   end
 
   class Provider::Rundeck::Apt < Provider::Rundeck
     def install_rundeck
       enable_repository
       install_package
+      remove_package_service_scripts
     end
 
     def enable_repository
@@ -179,6 +231,16 @@ class Chef
       package 'rundeck' do
         action :upgrade unless new_resource.version
         version new_resource.version
+      end
+    end
+
+    def remove_package_service_scripts
+      file '/etc/init/rundeckd.conf' do
+        action :delete
+      end
+
+      file '/etc/init.d/rundeckd' do
+        action :delete
       end
     end
   end
