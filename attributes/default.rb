@@ -25,6 +25,7 @@ default['rundeck']['config_path'] = '/etc/rundeck'
 default['rundeck']['log_path'] = '/var/log/rundeck'
 default['rundeck']['user'] = 'rundeck'
 default['rundeck']['group'] = 'rundeck'
+default['rundeck']['jvm_options'] = ''
 
 # Framework configuration
 default['rundeck']['node_name']     = node.name

@@ -41,6 +41,7 @@ class Chef
     # Config options
     attribute(:user, kind_of: String, default: lazy { node['rundeck']['user'] })
     attribute(:group, kind_of: String, default: lazy { node['rundeck']['group'] })
+    attribute(:jvm_options, kind_of: String, default: lazy { node['rundeck']['jvm_options'] })
     attribute(:port, kind_of: [String, Integer], default: lazy { node['rundeck']['port'] })
     attribute(:log4j_port, kind_of: [String, Integer], default: lazy { node['rundeck']['log4j_port'] })
     attribute(:public_rss, equal_to: [true, false], default: lazy { node['rundeck']['public_rss'] })
