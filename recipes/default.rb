@@ -19,3 +19,8 @@
 #
 
 rundeck node['rundeck']['node_name']
+
+rundeck_user 'admin' do
+  password 'user'
+  roles %w{user}
+end

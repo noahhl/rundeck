@@ -21,7 +21,7 @@
 class Chef
   class Resource::Rundeck < Resource
     include Poise(container: true)
-    actions(:install)
+    actions(:install, :restart, :rebuild_realm)
 
     attribute(:node_name, kind_of: String, name_attribute: true)
     attribute(:version, kind_of: String, default: lazy { node['rundeck']['version'] })
@@ -37,6 +37,7 @@ class Chef
     attribute(:profile_config, template: true, default_source: 'profile.erb')
     attribute(:framework_config, template: true, default_source: 'framework.properties.erb')
     attribute(:rundeck_config, template: true, default_source: 'rundeck-config.properties.erb')
+    attribute(:realm_config, template: true, default_source: 'realm.properties.erb')
     attribute(:enable_default_acls, equal_to: [true, false], default: true)
     # Config options
     attribute(:user, kind_of: String, default: lazy { node['rundeck']['user'] })
@@ -78,6 +79,18 @@ class Chef
           install_rundeck
           write_configs
           configure_service
+        end
+      end
+    end
+
+    def action_restart
+      # TODO
+    end
+
+    def action_rebuild_realm
+      converge_by("install a rundeck server") do
+        notifying_block do
+          write_realm_config
         end
       end
     end
@@ -134,6 +147,7 @@ class Chef
       write_profile_config
       write_framework_config
       write_rundeck_config
+      write_realm_config
       write_default_acls if new_resource.enable_default_acls
     end
 
@@ -184,6 +198,15 @@ class Chef
         mode '600'
         content new_resource.rundeck_config_content
         notifies :restart, new_resource
+      end
+    end
+
+    def write_realm_config
+      file ::File.join(new_resource.config_path, 'realm.properties') do
+        owner new_resource.user
+        group new_resource.group
+        mode '600'
+        content new_resource.realm_config_content
       end
     end
 
