@@ -1,0 +1,10 @@
+project.name=<%= @new_resource.project_name %>
+project.ssh-authentication=<%= @new_resource.ssh_authentication %>
+project.ssh-keypath=<%= @new_resource.ssh_key %>
+service.NodeExecutor.default.provider=<%= @new_resource.executor %>
+service.FileCopier.default.provider=<%= @new_resource.file_copier %>
+<%- @new_resource.subresources.select {|r| r.is_a?(Chef::Resource::RundeckNodeSource) && r.action != :nothing }.each_with_index do |source, index| -%>
+<%- source.content.split("\n").select {|line| !line.empty? }.each do |line| -%>
+resources.source.<%= index + 1 %>.<%= line %>
+<%- end -%>
+<%- end -%>

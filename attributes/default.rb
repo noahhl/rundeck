@@ -34,6 +34,8 @@ default['rundeck']['log4j_port']    = 4435
 default['rundeck']['public_rss']    = false
 default['rundeck']['logging_level'] = 'INFO'
 
+default['rundeck']['nodes'] = []
+
 # Administrator data bag
 default['rundeck']['admin']['encrypted_data_bag'] = true
 default['rundeck']['admin']['data_bag']           = 'credentials'

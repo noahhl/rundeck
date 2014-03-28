@@ -24,3 +24,7 @@ rundeck_user 'admin' do
   password 'user'
   roles %w{user}
 end
+
+rundeck_project 'foo'
+
+rundeck_node_source_file 'stuff'
