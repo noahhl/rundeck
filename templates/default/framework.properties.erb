@@ -9,7 +9,13 @@ framework.server.name = localhost
 framework.server.hostname = localhost
 framework.server.port = 4440
 framework.server.url = http://localhost:4440
-# Username/password used by CLI tools are not set.
+<%- if @new_resource.cli_user && !@new_resource.cli_user.empty? -%>
+# Username/password used by CLI tools.
+framework.server.username = <%= @new_resource.cli_user %>
+framework.server.password = <%= @new_resource.cli_password %>
+<%- else -%>
+# Username/password used by CLI tools not set.
+<%- end -%>
 
 # ----------------------------------------------------------------
 # Installation locations

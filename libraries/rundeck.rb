@@ -47,6 +47,10 @@ class Chef
     attribute(:log4j_port, kind_of: [String, Integer], default: lazy { node['rundeck']['log4j_port'] })
     attribute(:public_rss, equal_to: [true, false], default: lazy { node['rundeck']['public_rss'] })
     attribute(:logging_level, kind_of: String, default: lazy { node['rundeck']['logging_level'] })
+    # CLI usage
+    attribute(:cli_user, kind_of: [String, FalseClass], default: 'cli')
+    attribute(:cli_password, kind_of: String, required: true)
+    attribute(:create_cli_user, equal_to: [true, false], default: true)
 
     def after_created
       super
@@ -77,6 +81,7 @@ class Chef
           create_directories
           install_java
           install_rundeck
+          create_cli_user if new_resource.create_cli_user
           write_configs
           configure_service
         end
@@ -139,6 +144,14 @@ class Chef
 
     def install_rundeck
       raise NotImplementedError, "Jar launcher install not written"
+    end
+
+    def create_cli_user
+      rundeck_user new_resource.cli_user do
+        parent new_resource
+        password new_resource.cli_password
+        roles %w{admin cli}
+      end
     end
 
     def write_configs
