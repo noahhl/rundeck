@@ -47,8 +47,6 @@ class Chef
       if !node['rundeck']['nodes'].empty?
         node['rundeck']['nodes']
       elsif Chef::Config[:solo]
-        Chef::Log.error('!'*100)
-        Chef::Log.error(node.name.inspect)
         [{
           'name' => node.name,
           'description' => node['description'],
