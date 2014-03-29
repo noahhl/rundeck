@@ -1,0 +1,27 @@
+- schedule:
+    time:
+      hour: '22'
+      minute: '0'
+      seconds: '0'
+    month: '*'
+    year: '*'
+    weekday:
+      day: '*'
+  loglevel: INFO
+  sequence:
+    keepgoing: false
+    strategy: node-first
+    commands:
+    - exec: echo hello world
+  description: Foo bar
+  nodefilters:
+    dispatch:
+      threadcount: 1
+      keepgoing: false
+      excludePrecedence: true
+      rankOrder: ascending
+    filter: name:.*
+  options:
+    halp:
+      description: I dunno
+      value: eval()

@@ -3,6 +3,8 @@ DEPENDENCIES
   rundeck
     path: .
     metadata: true
+  rundeck_test
+    path: ./test/cookbooks/rundeck_test
 
 GRAPH
   apt (2.3.8)
@@ -14,6 +16,8 @@ GRAPH
     java (>= 0.0.0)
     poise (>= 0.0.0)
     runit (>= 0.0.0)
+  rundeck_test (0.0.0)
+    rundeck (>= 0.0.0)
   runit (1.5.10)
     build-essential (>= 0.0.0)
     yum (~> 3.0)

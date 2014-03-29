@@ -1,7 +1,7 @@
 #
 # Author:: Noah Kantrowitz <noah@coderanger.net>
 #
-# Copyright 2014, Noah Kantrowitz
+# Copyright 2014, Balanced, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,11 +16,5 @@
 # limitations under the License.
 #
 
-source 'https://api.berkshelf.com/'
-
-metadata
-
-group :test do
-  cookbook 'apt'
-  cookbook 'rundeck_test', path: 'test/cookbooks/rundeck_test'
-end
+name 'rundeck_test'
+depends 'rundeck'

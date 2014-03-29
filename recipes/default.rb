@@ -18,13 +18,11 @@
 # limitations under the License.
 #
 
-rundeck node['rundeck']['node_name']
+rundeck node['rundeck']['node_name'] do
+  cli_password 'password'
+end
 
 rundeck_user 'admin' do
   password 'user'
   roles %w{user}
 end
-
-rundeck_project 'foo'
-
-rundeck_node_source_file 'stuff'

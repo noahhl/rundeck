@@ -19,3 +19,7 @@ suites:
 - name: default
   run_list:
   - recipe[rundeck]
+- name: simple
+  run_list:
+  - recipe[rundeck]
+  - recipe[rundeck_test::simple]
