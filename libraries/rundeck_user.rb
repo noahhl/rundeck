@@ -31,6 +31,8 @@ class Chef
     attribute(:roles, kind_of: Array, default: [])
 
     def formatted_password
+      # Allow pre-obfuscated passwords
+      return password if password.start_with?('CRYPT:') || password.start_with?('MD5:')
       case format
       when 'crypt'
         'CRYPT:' + password.crypt('rb')
