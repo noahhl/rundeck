@@ -18,6 +18,8 @@
 # limitations under the License.
 #
 
+Chef::Log.error('The default rundeck recipe is for testing purposes only. Caveat emptor.')
+
 rundeck node['rundeck']['node_name'] do
   cli_password 'password'
 end
