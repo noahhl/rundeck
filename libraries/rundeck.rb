@@ -21,7 +21,7 @@
 class Chef
   class Resource::Rundeck < Resource
     include Poise(container: true)
-    actions(:install, :restart, :rebuild_realm)
+    actions(:install, :restart, :rebuild_realm, :wait_until_up)
 
     attribute(:node_name, kind_of: String, name_attribute: true)
     attribute(:version, kind_of: String, default: lazy { node['rundeck']['version'] })
@@ -75,6 +75,7 @@ class Chef
 
   class Provider::Rundeck < Provider
     include Poise
+    include Mixin::ShellOut
 
     def action_install
       converge_by("install a rundeck server") do
@@ -93,7 +94,8 @@ class Chef
     end
 
     def action_restart
-      # TODO
+      service_resource.run_action(:restart)
+      action_wait_until_up
     end
 
     def action_rebuild_realm
@@ -101,6 +103,20 @@ class Chef
         notifying_block do
           write_realm_config
         end
+      end
+    end
+
+    def action_wait_until_up
+      Chef::Log.info "Waiting until Jenkins is listening on port #{new_resource.port}"
+      until service_listening?
+        sleep 1
+        Chef::Log.debug('.')
+      end
+
+      Chef::Log.info 'Waiting until the Jenkins API is responding'
+      until endpoint_responding?
+        sleep 1
+        Chef::Log.debug('.')
       end
     end
 
@@ -250,15 +266,59 @@ class Chef
       end
     end
 
-    def configure_service
+    def service_resource
       include_recipe 'runit'
 
-      runit_service new_resource.service_name do
-        cookbook 'rundeck'
-        run_template_name 'rundeck'
-        log_template_name 'rundeck'
-        options new_resource: new_resource
+      if !@service_resource
+        subcontext_block do
+          @service_resource = runit_service new_resource.service_name do
+            action :nothing
+            cookbook 'rundeck'
+            run_template_name 'rundeck'
+            log_template_name 'rundeck'
+            options new_resource: new_resource
+          end
+        end
       end
+      @service_resource
+    end
+
+    def configure_service
+      r = service_resource
+      ruby_block 'configure_service' do
+        block do
+          r.run_action(:enable)
+          r.run_action(:start)
+        end
+        # I hate this
+        notifies :wait_until_up, new_resource, :immediately
+      end
+    end
+
+    # Helpers used to check if Rundeck is available
+    def service_listening?
+      cmd = shell_out!('netstat -lnt')
+      cmd.stdout.each_line.select do |l|
+        l.split[3] =~ /#{new_resource.port}/
+      end.any?
+    end
+
+    def endpoint_responding?
+      url = "http://localhost:#{new_resource.port}/login"
+      response = Chef::REST::RESTRequest.new(:GET, URI.parse(url), nil).call
+      if response.kind_of?(Net::HTTPSuccess) ||
+            response.kind_of?(Net::HTTPOK) ||
+            response.kind_of?(Net::HTTPRedirection) ||
+            response.kind_of?(Net::HTTPForbidden)
+        Chef::Log.debug("GET to #{url} successful")
+        return true
+      else
+        Chef::Log.debug("GET to #{url} returned #{response.code} / #{response.class}")
+        return false
+      end
+    rescue EOFError, Errno::ECONNREFUSED
+      Chef::Log.debug("GET to #{url} failed with connection refused")
+      return false
     end
   end
 
