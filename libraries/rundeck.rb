@@ -51,6 +51,9 @@ class Chef
     attribute(:cli_user, kind_of: [String, FalseClass], default: 'cli')
     attribute(:cli_password, kind_of: String, required: true)
     attribute(:create_cli_user, equal_to: [true, false], default: true)
+    # SSH Options
+    attribute(:ssh_user, kind_of: String, default: 'rundeck')
+    attribute(:ssh_key, kind_of: String)
 
     def after_created
       super
@@ -83,6 +86,7 @@ class Chef
           install_rundeck
           create_cli_user if new_resource.create_cli_user
           write_configs
+          write_ssh_key if new_resource.ssh_key
           configure_service
         end
       end
@@ -234,6 +238,15 @@ class Chef
         parent new_resource
         source 'apitoken.aclpolicy.erb'
         cookbook 'rundeck'
+      end
+    end
+
+    def write_ssh_key
+      file ::File.join(new_resource.path, '.ssh', 'id_rsa') do
+        owner new_resource.user
+        group new_resource.group
+        mode '600'
+        content new_resource.ssh_key
       end
     end
 
