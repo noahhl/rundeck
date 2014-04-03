@@ -277,6 +277,7 @@ class Chef
             run_template_name 'rundeck'
             log_template_name 'rundeck'
             options new_resource: new_resource
+            sv_timeout 60 # It can be slow while the cache is loading
           end
         end
       end
