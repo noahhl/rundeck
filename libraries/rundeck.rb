@@ -107,7 +107,7 @@ class Chef
     end
 
     def action_wait_until_up
-      Chef::Log.info "Waiting until Jenkins is listening on port #{new_resource.port}"
+      Chef::Log.info "Waiting until Rundeck is listening on port #{new_resource.port}"
       until service_listening?
         sleep 1
         Chef::Log.debug('.')
