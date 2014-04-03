@@ -1,0 +1,5 @@
+rundecklogin {
+  org.eclipse.jetty.plus.jaas.spi.PropertyFileLoginModule required
+  debug="true"
+  file="<%= ::File.join(@new_resource.config_path, 'realm.properties') %>";
+};

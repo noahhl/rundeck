@@ -1,0 +1,19 @@
+export RDECK_BASE="<%= @new_resource.path %>"
+
+export CLI_CP=$(find "<%= @new_resource.path %>/cli" -name \*.jar -printf %p:)
+export BOOTSTRAP_CP=$(find "<%= @new_resource.path %>/bootstrap" -name \*.jar -printf %p:)
+export RDECK_JVM="-Djava.security.auth.login.config=<%= File.join(@new_resource.config_path, 'jaas-loginmodule.conf') %> \
+  -Drdeck.config=<%= @new_resource.config_path %> \
+  -Drdeck.base=<%= @new_resource.path %> \
+  -Drundeck.server.configDir=<%= @new_resource.config_path %> \
+  -Dserver.datastore.path=<%= File.join(@new_resource.path, 'data') %> \
+  -Drundeck.server.serverDir=<%= @new_resource.path %> \
+  -Drdeck.projects=<%= File.join(@new_resource.path, 'projects') %> \
+  -Drdeck.runlogs=<%= @new_resource.log_path %> \
+  -Drundeck.config.location=<%= File.join(@new_resource.config_path, 'rundeck-config.properties') %> \
+  -Xmx1024m -Xms256m -server <%= @new_resource.jvm_options %>"
+
+# Is this even used?
+export RDECK_SSL_OPTS="-Djavax.net.ssl.trustStore=$RDECK_BASE/ssl/truststore -Djavax.net.ssl.trustStoreType=jks -Djava.protocol.handler.pkgs=com.sun.net.ssl.internal.www.protocol"
+
+unset JRE_HOME

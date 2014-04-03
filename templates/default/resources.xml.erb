@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <%- @new_resource.nodes.each do |n| -%>
+  <node name="<%= n['name'] %>"
+        description="<%= n['description'] || n['name'] %>"
+        tags="<%= (n['roles'] + n['recipes']).join(',') %>"
+        hostname="<%= n['fqdn'] %>"
+        osArch="<%= n['kernel_machine'] %>"
+        osFamily="<%= n['os'] %>"
+        osName="<%= n['kernel_name'] %>"
+        osVersion="<%= n['kernel_release'] %>"
+        username="rundeck"
+        />
+  <%- end -%>
+</project>

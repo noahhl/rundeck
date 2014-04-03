@@ -1,0 +1,3 @@
+<%- @new_resource.subresources.select {|r| r.is_a?(Chef::Resource::RundeckUser) && r.action != :nothing }.each do |user| -%>
+<%= user.username %>: <%= ([user.formatted_password] + user.roles).join(',') %>
+<%- end -%>

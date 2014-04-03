@@ -1,0 +1,7 @@
+#!/bin/bash
+exec 2>&1
+cd <%= @options[:new_resource].path %>
+source /etc/rundeck/profile
+exec chpst -u <%= @options[:new_resource].user %> -U <%= @options[:new_resource].user %> \
+  "${JAVA_HOME:-/usr}/bin/java" ${RDECK_JVM} -cp ${BOOTSTRAP_CP} com.dtolabs.rundeck.RunServer <%= @options[:new_resource].path %> <%= @options[:new_resource].port %>
+

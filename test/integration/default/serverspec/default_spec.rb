@@ -16,11 +16,30 @@
 # limitations under the License.
 #
 
-source 'https://api.berkshelf.com/'
+require 'serverspec'
+include Serverspec::Helper::Exec
+include Serverspec::Helper::DetectOS
 
-metadata
+describe 'Configuration' do
+  describe file('/etc/rundeck') do
+    it { should be_a_directory }
+  end
 
-group :test do
-  cookbook 'apt'
-  cookbook 'rundeck_test', path: 'test/cookbooks/rundeck_test'
+  describe file('/etc/rundeck/admin.aclpolicy') do
+    it { should be_a_file }
+  end
+
+  describe file('/etc/rundeck/apitoken.aclpolicy') do
+    it { should be_a_file }
+  end
+
+  describe file('/etc/rundeck/framework.properties') do
+    it { should be_a_file }
+  end
+end
+
+describe 'Service' do
+  describe file('/etc/service/rundeck') do
+    it { should be_a_directory }
+  end
 end
