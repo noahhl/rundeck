@@ -33,6 +33,7 @@ default['rundeck']['port']          = 4440
 default['rundeck']['log4j_port']    = 4435
 default['rundeck']['public_rss']    = false
 default['rundeck']['logging_level'] = 'INFO'
+default['rundeck']['hostname']      = 'localhost'
 
 default['rundeck']['nodes'] = []
 

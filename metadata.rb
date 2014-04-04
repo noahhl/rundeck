@@ -19,7 +19,7 @@
 #
 
 name 'rundeck'
-version '1.0.1'
+version '1.0.2'
 
 maintainer 'Panagiotis Papadomitsos'
 maintainer_email 'pj@ezgr.net'
