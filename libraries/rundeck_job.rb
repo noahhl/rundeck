@@ -29,7 +29,6 @@ class Chef
     attribute(:job_name, kind_of: String, default: lazy { name.split('::').last })
     attribute(:format, equal_to: %w{xml yaml}, default: 'yaml')
     attribute('', template: true, required: true)
-    attribute(:variables, kind_of: Hash, default: {})
 
     def clean_content
       case format

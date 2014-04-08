@@ -12,8 +12,8 @@
     keepgoing: false
     strategy: node-first
     commands:
-    - exec: <%= @new_resource.variables[:command] %>
-  description: <%= @new_resource.variables[:description] %>
+    - exec: <%= @command %>
+  description: <%= @description %>
   nodefilters:
     dispatch:
       threadcount: 1

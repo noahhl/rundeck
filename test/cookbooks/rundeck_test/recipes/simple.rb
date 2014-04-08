@@ -22,7 +22,7 @@ rundeck_node_source_file 'teapot'
 
 rundeck_job 'short' do
   source 'job-one.yml.erb'
-  variables(
+  options(
     :description => 'Utah teapot',
     :command => 'echo Newell teapot'
   )
