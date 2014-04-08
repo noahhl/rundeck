@@ -12,8 +12,8 @@
     keepgoing: false
     strategy: node-first
     commands:
-    - exec: echo hello world
-  description: Foo bar
+    - exec: <%= @new_resource.variables[:command] %>
+  description: <%= @new_resource.variables[:description] %>
   nodefilters:
     dispatch:
       threadcount: 1
