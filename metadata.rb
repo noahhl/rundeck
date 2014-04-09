@@ -1,6 +1,6 @@
 #
 # Author:: Panagiotis Papadomitsos (<pj@ezgr.net>)
-# Author:: Noah Kantrowitz <noah@coderanger.net>
+# Author:: Noah Kantrowitz (<noah@coderanger.net>)
 #
 # Copyright 2013-2014, Panagiotis Papadomitsos
 # Copyright 2014, Balanced, Inc.
@@ -19,7 +19,7 @@
 #
 
 name 'rundeck'
-version '1.0.2'
+version '1.0.6'
 
 maintainer 'Panagiotis Papadomitsos'
 maintainer_email 'pj@ezgr.net'
