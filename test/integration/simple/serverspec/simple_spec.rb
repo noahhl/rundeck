@@ -43,7 +43,7 @@ end
 describe 'Project teapot' do
   describe 'Job stout' do
     describe command('rd-jobs list --project teapot') do
-      its(:stdout) { should match(/^- short/) }
+      its(:stdout) { should match(/^- short - 'Utah teapot'/) }
     end
   end
 end

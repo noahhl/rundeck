@@ -47,6 +47,7 @@ class Chef
     attribute(:log4j_port, kind_of: [String, Integer], default: lazy { node['rundeck']['log4j_port'] })
     attribute(:public_rss, equal_to: [true, false], default: lazy { node['rundeck']['public_rss'] })
     attribute(:logging_level, kind_of: String, default: lazy { node['rundeck']['logging_level'] })
+    attribute(:hostname, kind_of: String, default: lazy { node['rundeck']['hostname'] })
     # CLI usage
     attribute(:cli_user, kind_of: [String, FalseClass], default: 'cli')
     attribute(:cli_password, kind_of: String, required: true)

@@ -38,6 +38,7 @@ class Chef
     attribute('', template: true, default_source: 'source_file.properties.erb')
     attribute(:resources_xml, template: true, default_source: 'resources.xml.erb')
     attribute(:query, kind_of: String, default: lazy { "chef_environment:#{node.chef_environment}" })
+    attribute(:limit, kind_of: Integer)
 
     def path
       ::File.join(parent.project_path, 'etc', 'resources.xml')
@@ -45,9 +46,9 @@ class Chef
 
     def nodes
       if !node['rundeck']['nodes'].empty?
-        node['rundeck']['nodes']
+        nodes = node['rundeck']['nodes']
       elsif Chef::Config[:solo]
-        [{
+        nodes = [{
           'name' => node.name,
           'description' => node['description'],
           'roles' => node['roles'],
@@ -59,7 +60,7 @@ class Chef
           'kernel_release' => node['kernel']['release'],
         }]
       else
-        partial_search(:node, query, keys: {
+        nodes = partial_search(:node, query, keys: {
           name: %w{name},
           description: %w{description},
           roles: %w{roles},
@@ -70,6 +71,11 @@ class Chef
           kernel_name: %w{kernel name},
           kernel_release: %w{kernel release},
         })
+      end
+      if limit.nil?
+        nodes
+      else
+        nodes.slice(0, limit)
       end
     end
   end
