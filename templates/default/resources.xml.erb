@@ -9,7 +9,7 @@
         osFamily="<%= n['os'] %>"
         osName="<%= n['kernel_name'] %>"
         osVersion="<%= n['kernel_release'] %>"
-        username="rundeck"
+        username="<%= @new_resource.username %>"
         />
   <%- end -%>
 </project>
