@@ -59,3 +59,7 @@ default['rundeck']['mail'] = {
 default['rundeck']['mail']['recipients_data_bag'] = 'users'
 default['rundeck']['mail']['recipients_query']    = 'notify:true'
 default['rundeck']['mail']['recipients_field']    = "['email']"
+
+default['rundeck']['proxy']['hostname'] = 'localhost'
+default['rundeck']['proxy']['port'] = 4440
+default['rundeck']['proxy']['scheme'] = 'http'
