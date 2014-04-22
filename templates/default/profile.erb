@@ -11,6 +11,7 @@ export RDECK_JVM="-Djava.security.auth.login.config=<%= File.join(@new_resource.
   -Drdeck.projects=<%= File.join(@new_resource.path, 'projects') %> \
   -Drdeck.runlogs=<%= @new_resource.log_path %> \
   -Drundeck.config.location=<%= File.join(@new_resource.config_path, 'rundeck-config.properties') %> \
+  -Drundeck.jetty.connector.forwarded=true \
   -Xmx1024m -Xms256m -server <%= @new_resource.jvm_options %>"
 
 # Is this even used?
