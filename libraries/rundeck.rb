@@ -47,6 +47,12 @@ class Chef
     attribute(:log4j_port, kind_of: [String, Integer], default: lazy { node['rundeck']['log4j_port'] })
     attribute(:public_rss, equal_to: [true, false], default: lazy { node['rundeck']['public_rss'] })
     attribute(:logging_level, kind_of: String, default: lazy { node['rundeck']['logging_level'] })
+    attribute(:hostname, kind_of: String, default: lazy { node['rundeck']['hostname'] })
+
+    attribute(:proxy_port, kind_of: [String, Integer], default: lazy { node['rundeck']['proxy']['port'] })
+    attribute(:proxy_host, kind_of: String, default: lazy { node['rundeck']['proxy']['hostname'] })
+    attribute(:proxy_scheme, kind_of: String, default: lazy { node['rundeck']['proxy']['scheme'] })
+
     # CLI usage
     attribute(:cli_user, kind_of: [String, FalseClass], default: 'cli')
     attribute(:cli_password, kind_of: String, required: true)
@@ -107,7 +113,7 @@ class Chef
     end
 
     def action_wait_until_up
-      Chef::Log.info "Waiting until Jenkins is listening on port #{new_resource.port}"
+      Chef::Log.info "Waiting until Rundeck is listening on port #{new_resource.port}"
       until service_listening?
         sleep 1
         Chef::Log.debug('.')
@@ -277,6 +283,7 @@ class Chef
             run_template_name 'rundeck'
             log_template_name 'rundeck'
             options new_resource: new_resource
+            sv_timeout 60 # It can be slow while the cache is loading
           end
         end
       end

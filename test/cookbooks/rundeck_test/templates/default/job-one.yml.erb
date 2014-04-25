@@ -12,8 +12,8 @@
     keepgoing: false
     strategy: node-first
     commands:
-    - exec: echo hello world
-  description: Foo bar
+    - exec: <%= @command %>
+  description: <%= @description %>
   nodefilters:
     dispatch:
       threadcount: 1
