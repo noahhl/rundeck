@@ -19,7 +19,7 @@
 #
 
 name 'rundeck'
-version '99.1.0'
+version '99.1.1'
 
 maintainer 'Noah Kantrowitz'
 maintainer_email 'noah@coderanger.net'
