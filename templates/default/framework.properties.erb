@@ -36,8 +36,8 @@ framework.libext.dir = <%= ::File.join(@new_resource.path, 'libext') %>
 
 <%- if @new_resource.ssh_key %>
 framework.ssh.keypath = <%= ::File.join(@new_resource.path, '.ssh', 'id_rsa') %>
-framework.ssh.user = <%= @new_resource.ssh_user %>
 <%- end -%>
+framework.ssh.user = <%= @new_resource.ssh_user %>
 
 # ssh connection timeout after a specified number of milliseconds.
 # "0" value means wait forever.

@@ -4,7 +4,7 @@ DEPENDENCIES
     path: .
     metadata: true
   rundeck_test
-    path: ./test/cookbooks/rundeck_test
+    path: test/cookbooks/rundeck_test
 
 GRAPH
   apt (2.3.8)

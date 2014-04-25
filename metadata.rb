@@ -19,10 +19,10 @@
 #
 
 name 'rundeck'
-version '1.0.12'
+version '99.1.0'
 
-maintainer 'Panagiotis Papadomitsos'
-maintainer_email 'pj@ezgr.net'
+maintainer 'Noah Kantrowitz'
+maintainer_email 'noah@coderanger.net'
 license 'Apache 2.0'
 description 'Installs and configures the Rundeck administration console.'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))

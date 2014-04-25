@@ -26,5 +26,5 @@ end
 
 rundeck_user 'admin' do
   password 'user'
-  roles %w{user}
+  roles %w{admin user}
 end
