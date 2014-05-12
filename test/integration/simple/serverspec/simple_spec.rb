@@ -45,5 +45,10 @@ describe 'Project teapot' do
     describe command('rd-jobs list --project teapot') do
       its(:stdout) { should match(/^- short - 'Utah teapot'/) }
     end
+
+    describe command('rd-jobs --project teapot --name short --file /dev/stdout --format yaml') do
+      it { should return_exit_status(0) }
+      its(:stdout) { should include('description: I dunno') }
+    end
   end
 end
