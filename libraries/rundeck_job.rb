@@ -53,6 +53,22 @@ class Chef
           job.delete('uuid')
           job.delete('project')
           job['name'] = job_name
+          # Pending https://github.com/rundeck/rundeck/issues/773
+          if job['schedule'] && job['schedule']['crontab']
+            crontab = job['schedule'].delete('crontab').split
+            # [sec, min, hour, dom, month, dow]
+            job['schedule']['time'] = {
+              'hour' => crontab[2],
+              'minute' => crontab[1],
+              'seconds' => crontab[0],
+            }
+            job['schedule']['month'] = crontab[4]
+            if crontab[5] == '?'
+              job['schedule']['dayofmonth'] = {'day' => crontab[3]}
+            else
+              job['schedule']['weekday'] = {'day' => crontab[5]}
+            end
+          end
         end
       end
       # The version of Psych in Ruby 1.9.3 generates *s as key: ! '*'
