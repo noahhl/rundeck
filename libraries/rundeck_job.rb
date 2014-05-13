@@ -53,6 +53,22 @@ class Chef
           job.delete('uuid')
           job.delete('project')
           job['name'] = job_name
+          # Pending https://github.com/rundeck/rundeck/issues/773
+          if job['schedule'] && job['schedule']['crontab']
+            crontab = job['schedule'].delete('crontab').split
+            # [sec, min, hour, dom, month, dow]
+            job['schedule']['time'] = {
+              'hour' => crontab[2],
+              'minute' => crontab[1],
+              'seconds' => crontab[0],
+            }
+            job['schedule']['month'] = crontab[4]
+            if crontab[5] == '?'
+              job['schedule']['dayofmonth'] = {'day' => crontab[3]}
+            else
+              job['schedule']['weekday'] = {'day' => crontab[5]}
+            end
+          end
         end
       end
       # The version of Psych in Ruby 1.9.3 generates *s as key: ! '*'
@@ -72,6 +88,8 @@ class Chef
         @current_resource.job_name(new_resource.job_name)
         @current_resource.format(new_resource.format)
         @current_resource.content(f.read)
+        Chef::Log.debug("Found existing job YAML for #{new_resource.job_name} in #{new_resource.parent.project_name}")
+        Chef::Log.debug(@new_resource.content)
       end
     end
 
@@ -79,7 +97,8 @@ class Chef
       if new_resource.clean_content != current_resource.clean_content
         converge_by("create Rundeck job #{new_resource.job_name} in #{new_resource.parent.project_name}") do
           tempfile do |f|
-            Chef::Log.error(new_resource.clean_content)
+            Chef::Log.debug("Writing job YAML for #{new_resource.job_name} in #{new_resource.parent.project_name}")
+            Chef::Log.debug(new_resource.clean_content)
             f.write(new_resource.clean_content)
             f.close
             rd_jobs('load', '--project', new_resource.parent.project_name, '--file', f.path, '--format', new_resource.format)
