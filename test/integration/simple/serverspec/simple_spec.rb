@@ -41,14 +41,37 @@ describe 'Configuration' do
 end
 
 describe 'Project teapot' do
-  describe 'Job stout' do
-    describe command('rd-jobs list --project teapot') do
-      its(:stdout) { should match(/^- short - 'Utah teapot'/) }
-    end
+  describe command('rd-jobs list --project teapot') do
+    its(:stdout) { should match(/^- short - 'Utah teapot'/) }
+  end
 
-    describe command('rd-jobs --project teapot --name short --file /dev/stdout --format yaml') do
-      it { should return_exit_status(0) }
-      its(:stdout) { should include('description: I dunno') }
-    end
+  describe command('rd-jobs --project teapot --name short --file /dev/stdout --format yaml') do
+    it { should return_exit_status(0) }
+    its(:stdout) { should include('description: I dunno') }
+  end
+end
+
+describe 'Project cron' do
+  describe command('rd-jobs list --project cron') do
+    its(:stdout) { should match(/^- crontab/) }
+    its(:stdout) { should match(/^- cron-verbose/) }
+  end
+
+  describe command('rd-jobs --project cron --name crontab --file /dev/stdout --format yaml') do
+    it { should return_exit_status(0) }
+    its(:stdout) { should include("seconds: '2'") }
+    its(:stdout) { should include("minute: '3'") }
+    its(:stdout) { should include("hour: '5'") }
+    #its(:stdout) { should include("month: '5'") } # Pending https://github.com/rundeck/rundeck/issues/774
+    its(:stdout) { should include("day: '7'") }
+  end
+
+  describe command('rd-jobs --project cron --name cron-verbose --file /dev/stdout --format yaml') do
+    it { should return_exit_status(0) }
+    its(:stdout) { should include("seconds: '17'") }
+    its(:stdout) { should include("minute: '19'") }
+    its(:stdout) { should include("hour: '23'") }
+    #its(:stdout) { should include("month: '2'") } # Pending https://github.com/rundeck/rundeck/issues/774
+    its(:stdout) { should include("day: '6'") }
   end
 end

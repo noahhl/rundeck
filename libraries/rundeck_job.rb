@@ -88,6 +88,8 @@ class Chef
         @current_resource.job_name(new_resource.job_name)
         @current_resource.format(new_resource.format)
         @current_resource.content(f.read)
+        Chef::Log.debug("Found existing job YAML for #{new_resource.job_name} in #{new_resource.parent.project_name}")
+        Chef::Log.debug(@new_resource.content)
       end
     end
 
@@ -95,7 +97,8 @@ class Chef
       if new_resource.clean_content != current_resource.clean_content
         converge_by("create Rundeck job #{new_resource.job_name} in #{new_resource.parent.project_name}") do
           tempfile do |f|
-            Chef::Log.error(new_resource.clean_content)
+            Chef::Log.debug("Writing job YAML for #{new_resource.job_name} in #{new_resource.parent.project_name}")
+            Chef::Log.debug(new_resource.clean_content)
             f.write(new_resource.clean_content)
             f.close
             rd_jobs('load', '--project', new_resource.parent.project_name, '--file', f.path, '--format', new_resource.format)

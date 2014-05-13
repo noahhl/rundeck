@@ -27,3 +27,22 @@ rundeck_job 'short' do
     :command => 'echo Newell teapot'
   )
 end
+
+rundeck_project 'cron'
+
+rundeck_node_source_file 'cron'
+
+# Wipe at the start to ensure https://github.com/rundeck/rundeck/issues/773 is caught
+%w{crontab cron-verbose}.each do |name|
+  execute "rd-jobs purge -p cron -n #{name}" do
+    environment 'RDECK_BASE' => '/var/lib/rundeck'
+  end
+end
+
+rundeck_job 'crontab' do
+  source 'job-crontab.yml.erb'
+end
+
+rundeck_job 'cron-verbose' do
+  source 'job-cron-verbose.yml.erb'
+end

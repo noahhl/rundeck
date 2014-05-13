@@ -1,0 +1,8 @@
+- loglevel: INFO
+  sequence:
+    keepgoing: false
+    strategy: node-first
+    commands:
+    - exec: echo crontab
+  schedule:
+    crontab: 2 3 5 7 5 ?

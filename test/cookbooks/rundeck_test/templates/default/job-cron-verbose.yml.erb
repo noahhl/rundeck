@@ -1,0 +1,14 @@
+- loglevel: INFO
+  sequence:
+    keepgoing: false
+    strategy: node-first
+    commands:
+    - exec: echo verbose
+  schedule:
+    time:
+      hour: '23'
+      minute: '19'
+      seconds: '17'
+    month: '2'
+    dayofmonth:
+      day: '6'
