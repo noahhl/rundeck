@@ -340,7 +340,7 @@ class Chef
       apt_repository 'rundeck-bintray' do
         uri 'https://dl.bintray.com/rundeck/rundeck-deb'
         distribution '/'
-        trusted true
+        trusted true # ಠ_ಠ
       end
     end
 
@@ -362,10 +362,25 @@ class Chef
     end
   end
 
-  class Provider::Rundeck::Yum < Provider::Rundeck
+  class Provider::Rundeck::Yum < Provider::Rundeck::Apt
     def install_rundeck
-      enable_repository
-      install_package
+      super
+      install_config_package
+    end
+
+    def enable_repository
+      yum_repository 'rundeck-bintray' do
+        description 'Rundeck binary builds'
+        baseurl 'https://dl.bintray.com/rundeck/rundeck-rpm '
+        gpgcheck false # ಠ_ಠ
+      end
+    end
+
+    def install_config_package
+      package 'rundeck-config' do
+        action :upgrade unless new_resource.version
+        version new_resource.version
+      end
     end
   end
 end
