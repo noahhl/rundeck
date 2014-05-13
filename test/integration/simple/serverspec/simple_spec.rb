@@ -40,6 +40,16 @@ describe 'Configuration' do
   end
 end
 
+describe 'Service' do
+  describe file('/etc/service/rundeck') do
+    it { should be_a_directory }
+  end
+
+  describe port(4440) do
+    it { should be_listening }
+  end
+end
+
 describe 'Project teapot' do
   describe command('rd-jobs list --project teapot') do
     its(:stdout) { should match(/^- short - 'Utah teapot'/) }

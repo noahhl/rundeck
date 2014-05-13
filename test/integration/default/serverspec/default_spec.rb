@@ -42,4 +42,8 @@ describe 'Service' do
   describe file('/etc/service/rundeck') do
     it { should be_a_directory }
   end
+
+  describe port(4440) do
+    it { should be_listening }
+  end
 end
