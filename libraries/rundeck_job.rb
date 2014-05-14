@@ -108,6 +108,11 @@ class Chef
     end
 
     def action_disable
+      unless current_resource.content.empty?
+        converge_by("remove Rundeck job #{new_resource.job_name} in #{new_resource.parent.project_name}") do
+          rd_jobs('purge', '--project', new_resource.parent.project_name, '--name', new_resource.name)
+        end
+      end
     end
 
     private

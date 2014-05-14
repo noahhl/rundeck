@@ -27,3 +27,7 @@ suites:
   run_list:
   - recipe[rundeck_test::jar]
   - recipe[rundeck_test::simple]
+- name: remove_job
+  run_list:
+  - recipe[rundeck]
+  - recipe[rundeck_test::remove_job]
