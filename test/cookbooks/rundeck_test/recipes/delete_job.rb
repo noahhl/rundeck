@@ -37,5 +37,5 @@ rundeck_job 'stout' do
 end
 
 rundeck_job 'short' do
-  action :disable
+  action :delete
 end

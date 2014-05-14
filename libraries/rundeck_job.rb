@@ -24,7 +24,7 @@ require File.expand_path('../rundeck_project', __FILE__)
 class Chef
   class Resource::RundeckJob < Resource
     include Poise(RundeckProject)
-    actions(:enable, :disable)
+    actions(:create, :delete)
 
     attribute(:job_name, kind_of: String, default: lazy { name.split('::').last })
     attribute(:format, equal_to: %w{xml yaml}, default: 'yaml')
@@ -93,7 +93,7 @@ class Chef
       end
     end
 
-    def action_enable
+    def action_create
       if new_resource.clean_content != current_resource.clean_content
         converge_by("create Rundeck job #{new_resource.job_name} in #{new_resource.parent.project_name}") do
           tempfile do |f|
@@ -107,9 +107,9 @@ class Chef
       end
     end
 
-    def action_disable
+    def action_delete
       unless current_resource.content.empty?
-        converge_by("remove Rundeck job #{new_resource.job_name} in #{new_resource.parent.project_name}") do
+        converge_by("delete Rundeck job #{new_resource.job_name} in #{new_resource.parent.project_name}") do
           rd_jobs('purge', '--project', new_resource.parent.project_name, '--name', new_resource.name)
         end
       end
