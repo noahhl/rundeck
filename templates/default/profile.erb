@@ -1,7 +1,8 @@
 export RDECK_BASE="<%= @new_resource.path %>"
 
-export CLI_CP=$(find "<%= @new_resource.path %>/cli" -name \*.jar -printf %p:)
-export BOOTSTRAP_CP=$(find "<%= @new_resource.path %>/bootstrap" -name \*.jar -printf %p:)
+<%# In these two finds, the first path is for package installs, the second is for launcher installs %>
+export CLI_CP=$(find "<%= @new_resource.path %>/cli" "<%= @new_resource.path %>/tools/lib" -name \*.jar -printf %p:)
+export BOOTSTRAP_CP=$(find "<%= @new_resource.path %>/bootstrap" "<%= @new_resource.path %>/lib" -name \*.jar -printf %p:)
 export RDECK_JVM="-Djava.security.auth.login.config=<%= File.join(@new_resource.config_path, 'jaas-loginmodule.conf') %> \
   -Drdeck.config=<%= @new_resource.config_path %> \
   -Drdeck.base=<%= @new_resource.path %> \

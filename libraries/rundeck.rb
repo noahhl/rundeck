@@ -61,6 +61,11 @@ class Chef
     attribute(:ssh_user, kind_of: String, default: 'rundeck')
     attribute(:ssh_key, kind_of: String)
 
+    # Only used with the JAR-based installer
+    def jar_path
+      ::File.join(Chef::Config[:file_cache_path], "rundeck-launcher-#{version}.jar")
+    end
+
     def after_created
       super
       # Interpolate the version into the launcher download URL
@@ -169,7 +174,34 @@ class Chef
     end
 
     def install_rundeck
-      raise NotImplementedError, "Jar launcher install not written"
+      raise "Version must be specified when installing from a JAR" unless new_resource.version
+      manifest_path = ::File.join(new_resource.path, 'server/exp/webapp/META-INF/MANIFEST.MF'.split('/'))
+      manifest = if ::File.exists?(manifest_path)
+        IO.read(manifest_path)
+      else
+        ''
+      end
+      unless manifest.include?("Implementation-Version: #{new_resource.version}\n")
+        download_jar
+        install_jar
+      end
+    end
+
+    def download_jar
+      remote_file new_resource.jar_path do
+        source "https://s3.amazonaws.com/download.rundeck.org/jar/rundeck-launcher-#{new_resource.version}.jar"
+        owner 'root'
+        group 'root'
+        mode '600'
+      end
+    end
+
+    def install_jar
+      execute "java -jar #{new_resource.jar_path} -c #{new_resource.config_path} -b #{new_resource.path} --serverdir #{new_resource.path} -s /usr/sbin -x /usr/bin --installonly" do
+        user 'root'
+        group 'root'
+        cwd '/'
+      end
     end
 
     def create_cli_user

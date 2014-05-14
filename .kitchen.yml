@@ -23,3 +23,7 @@ suites:
   run_list:
   - recipe[rundeck]
   - recipe[rundeck_test::simple]
+- name: jar
+  run_list:
+  - recipe[rundeck_test::jar]
+  - recipe[rundeck_test::simple]
