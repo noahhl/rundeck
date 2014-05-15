@@ -19,7 +19,7 @@
 #
 
 default['rundeck']['version'] = nil # Use latest by default
-default['rundeck']['launcher_url'] = 'https://download.rundeck.org/jar/rundeck-launcher-%{version}.jar'
+default['rundeck']['launcher_url'] = 'https://s3.amazonaws.com/download.rundeck.org/jar/rundeck-launcher-%{version}.jar'
 default['rundeck']['path'] = '/var/lib/rundeck'
 default['rundeck']['config_path'] = '/etc/rundeck'
 default['rundeck']['log_path'] = '/var/log/rundeck'

@@ -189,7 +189,7 @@ class Chef
 
     def download_jar
       remote_file new_resource.jar_path do
-        source "https://s3.amazonaws.com/download.rundeck.org/jar/rundeck-launcher-#{new_resource.version}.jar"
+        source new_resource.launcher_url
         owner 'root'
         group 'root'
         mode '600'
