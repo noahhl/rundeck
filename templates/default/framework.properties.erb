@@ -42,3 +42,18 @@ framework.ssh.user = <%= @new_resource.ssh_user %>
 # ssh connection timeout after a specified number of milliseconds.
 # "0" value means wait forever.
 framework.ssh.timeout = 0
+
+# ----------------------------------------------------------------
+# Email settings
+# ----------------------------------------------------------------
+
+framework.email.from = <%= @new_resource.email['from'] %>
+framework.email.replyto = <%= @new_resource.email['from'] %>
+framework.email.mailhost = <%= @new_resource.email['hostname'] %>
+framework.email.mailport = <%= @new_resource.email['port'] %>
+<%- if @new_resource.email['username'] -%>
+framework.email.user = <%= @new_resource.email['username'] %>
+framework.email.password = <%= @new_resource.email['password'] %>
+framework.email.ssl = <%= @new_resource.email['tls'] ? 'true' : 'false' %>
+<%- end -%>
+framework.email.failonerror = true

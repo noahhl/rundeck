@@ -28,13 +28,13 @@ default['rundeck']['group'] = 'rundeck'
 default['rundeck']['jvm_options'] = ''
 
 # Framework configuration
-default['rundeck']['node_name']     = node.name
-default['rundeck']['port']          = 4440
-default['rundeck']['log4j_port']    = 4435
-default['rundeck']['public_rss']    = false
-default['rundeck']['logging_level'] = 'INFO'
-default['rundeck']['hostname']      = 'localhost'
+default['rundeck']['node_name'] = node.name
+default['rundeck']['port'] = 4440
+default['rundeck']['public_rss'] = false
+default['rundeck']['logging_level'] = 'INFO' # Is this useful? It is required to be set in imported jobs.
+default['rundeck']['hostname'] = 'localhost'
 
+# Nodes data
 default['rundeck']['nodes'] = []
 
 # DANGER, DANGER WILL ROBINSON
@@ -44,20 +44,15 @@ default['rundeck']['cli_password'] = 'password'
 default['rundeck']['admin_password'] = nil
 # /DANGER ZONE
 
+# Email settings
+default['rundeck']['email']['hostname'] = 'localhost'
+default['rundeck']['email']['port'] = 25
+default['rundeck']['email']['username'] = nil
+default['rundeck']['email']['password'] = nil
+default['rundeck']['email']['from'] = 'undeck@example.com'
+default['rundeck']['email']['tls'] = false
 
-# Mail data bag
-default['rundeck']['mail'] = {
-  'hostname'    => 'localhost',
-  'port'        => 25,
-  'username'    => nil,
-  'password'    => nil,
-  'from'        => 'ops@example.com',
-  'tls'         => false
-}
-default['rundeck']['mail']['recipients_data_bag'] = 'users'
-default['rundeck']['mail']['recipients_query']    = 'notify:true'
-default['rundeck']['mail']['recipients_field']    = "['email']"
-
+# Proxy settings
 default['rundeck']['proxy']['hostname'] = 'localhost'
 default['rundeck']['proxy']['port'] = 4440
 default['rundeck']['proxy']['scheme'] = 'http'

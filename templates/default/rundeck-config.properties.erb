@@ -1,9 +1,9 @@
 #loglevel.default is the default log level for jobs: ERROR,WARN,INFO,VERBOSE,DEBUG
-loglevel.default = INFO
+loglevel.default = <%= @new_resource.logging_level %>
 rdeck.base = <%= @new_resource.path %>
 
 #rss.enabled if set to true enables RSS feeds that are public (non-authenticated)
-rss.enabled = false
+rss.enabled = <%= @new_resource.public_rss ? 'true' : 'false' %>
 # change hostname here
 grails.serverURL = <%= @new_resource.proxy_scheme %>://<%= @new_resource.proxy_host %>:<%= @new_resource.proxy_port %>
 dataSource.dbCreate = update
