@@ -18,13 +18,15 @@
 # limitations under the License.
 #
 
-Chef::Log.error('The default rundeck recipe is for testing purposes only. Caveat emptor.')
+Chef::Log.error('The default rundeck recipe is highly insecure. Please see the README for more information. Caveat emptor.')
 
 rundeck node['rundeck']['node_name'] do
-  cli_password 'password'
+  cli_password node['rundeck']['cli_password']
 end
 
-rundeck_user 'admin' do
-  password 'user'
-  roles %w{admin user}
+if node['rundeck']['admin_password']
+  rundeck_user 'admin' do
+    password node['rundeck']['admin_password']
+    roles %w{admin user}
+  end
 end

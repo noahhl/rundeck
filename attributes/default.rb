@@ -37,14 +37,12 @@ default['rundeck']['hostname']      = 'localhost'
 
 default['rundeck']['nodes'] = []
 
-# Administrator data bag
-default['rundeck']['admin']['encrypted_data_bag'] = true
-default['rundeck']['admin']['data_bag']           = 'credentials'
-default['rundeck']['admin']['data_bag_id']        = 'rundeck'
-# For Solo runs with no data bags
-default['rundeck']['admin']['username']           = 'admin'
-default['rundeck']['admin']['password']           = 'a73e319b433528eaa646' # Override this!
-default['rundeck']['admin']['ssh_key']            = ''
+# DANGER, DANGER WILL ROBINSON
+# USE OF THESE ATTRIBUTES IS INSECURE
+# REALLY DON'T USE THEM
+default['rundeck']['cli_password'] = 'password'
+default['rundeck']['admin_password'] = nil
+# /DANGER ZONE
 
 
 # Mail data bag
