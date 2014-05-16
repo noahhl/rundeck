@@ -32,7 +32,6 @@ default['rundeck']['node_name'] = node.name
 default['rundeck']['port'] = 4440
 default['rundeck']['public_rss'] = false
 default['rundeck']['logging_level'] = 'INFO' # Is this useful? It is required to be set in imported jobs.
-default['rundeck']['hostname'] = 'localhost'
 
 # Nodes data
 default['rundeck']['nodes'] = []

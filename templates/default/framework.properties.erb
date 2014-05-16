@@ -6,9 +6,9 @@
 # ----------------------------------------------------------------
 
 framework.server.name = localhost
-framework.server.hostname = <%= @new_resource.hostname %>
+framework.server.hostname = localhost
 framework.server.port = <%= @new_resource.port %>
-framework.server.url = http://<%= @new_resource.hostname %>:<%= @new_resource.port %>
+framework.server.url = http://localhost:<%= @new_resource.port %>
 <%- if @new_resource.cli_user && !@new_resource.cli_user.empty? -%>
 # Username/password used by CLI tools.
 framework.server.username = <%= @new_resource.cli_user %>
