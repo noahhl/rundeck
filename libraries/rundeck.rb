@@ -57,7 +57,7 @@ class Chef
     attribute(:create_cli_user, equal_to: [true, false], default: true)
 
     # SSH Options
-    attribute(:ssh_user, kind_of: String, default: 'rundeck')
+    attribute(:ssh_user, kind_of: String, default: lazy { node['rundeck']['ssh_user'] })
     attribute(:ssh_key, kind_of: String)
 
     # Only used with the JAR-based installer

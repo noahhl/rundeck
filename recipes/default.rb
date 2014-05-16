@@ -22,6 +22,7 @@ Chef::Log.error('The default rundeck recipe is highly insecure. Please see the R
 
 rundeck node['rundeck']['node_name'] do
   cli_password node['rundeck']['cli_password']
+  ssh_key node['rundeck']['ssh_key']
 end
 
 if node['rundeck']['admin_password']

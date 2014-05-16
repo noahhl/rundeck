@@ -26,6 +26,7 @@ default['rundeck']['log_path'] = '/var/log/rundeck'
 default['rundeck']['user'] = 'rundeck'
 default['rundeck']['group'] = 'rundeck'
 default['rundeck']['jvm_options'] = ''
+default['rundeck']['ssh_user'] = 'rundeck'
 
 # Framework configuration
 default['rundeck']['node_name'] = node.name
@@ -41,6 +42,7 @@ default['rundeck']['nodes'] = []
 # REALLY DON'T USE THEM
 default['rundeck']['cli_password'] = 'password'
 default['rundeck']['admin_password'] = nil
+default['rundeck']['ssh_key'] = nil
 # /DANGER ZONE
 
 # Email settings
