@@ -118,6 +118,7 @@ class Chef
     private
 
     def rd_jobs(*arguments)
+      Chef::Log.warn("No CLI password is set, rd-jobs is likely to fail") unless new_resource.parent.cli_password
       shell_out!(['rd-jobs']+arguments, environment: {'RDECK_BASE' => new_resource.parent.parent.path})
     end
 
