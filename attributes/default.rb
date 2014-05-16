@@ -52,6 +52,6 @@ default['rundeck']['email']['from'] = 'undeck@example.com'
 default['rundeck']['email']['tls'] = false
 
 # Proxy settings
-default['rundeck']['proxy']['hostname'] = 'localhost'
-default['rundeck']['proxy']['port'] = 4440
-default['rundeck']['proxy']['scheme'] = 'http'
+default['rundeck']['external_hostname'] = 'localhost'
+default['rundeck']['external_port'] = nil # Default is the same as port
+default['rundeck']['external_scheme'] = 'http'

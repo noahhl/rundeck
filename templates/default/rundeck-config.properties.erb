@@ -5,6 +5,6 @@ rdeck.base = <%= @new_resource.path %>
 #rss.enabled if set to true enables RSS feeds that are public (non-authenticated)
 rss.enabled = <%= @new_resource.public_rss ? 'true' : 'false' %>
 # change hostname here
-grails.serverURL = <%= @new_resource.proxy_scheme %>://<%= @new_resource.proxy_host %>:<%= @new_resource.proxy_port %>
+grails.serverURL = <%= @new_resource.external_scheme %>://<%= @new_resource.external_host %>:<%= @new_resource.external_port %>
 dataSource.dbCreate = update
 dataSource.url = jdbc:h2:file:<%= ::File.join(@new_resource.path, 'data', 'rundeckdb') %>;MVCC=true
