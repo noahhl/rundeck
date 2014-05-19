@@ -347,20 +347,25 @@ depends 'citadel'
 ### recipes/default.rb
 
 ```ruby
+# Install Rundeck
 rundeck node['rundeck']['node_name'] do
   cli_password citadel['rundeck/cli_password']
   ssh_key citadel['deploy_key/deploy.pem']
 end
 
+# Create an admin user for ourselves
 rundeck_user 'asmithee' do
   format 'plain'
   password 'MD5:'+citadel['rundeck/asmithee_password']
   roles %w{admin user}
 end
 
+# Create a project for general purpose jobs
 rundeck_project 'mycompany' do
+  # Create a node source using all Chef nodes in the same environment
   rundeck_node_source_file 'mycompany'
 
+  # Create two jobs from template files
   rundeck_job 'deploy' do
     source 'deploy.yml.erb'
   end
