@@ -73,11 +73,8 @@ class Chef
           kernel_release: %w{kernel release},
         })
       end
-      if limit.nil?
-        nodes
-      else
-        nodes.slice(0, limit)
-      end
+      nodes = nodes.take(limit) if limit
+      nodes
     end
   end
 
