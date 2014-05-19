@@ -188,12 +188,29 @@ end
 
 #### Providers
 
-The overall default `Chef::Provider::Rundeck` installs Rundeck using the JAR launcher.
-This should work on any platform where Java is supported. If you are on a
-Debian-family OS, the default provider is `Chef::Provider::Rundeck::Apt`, which
-installs from the official apt repository. If you are on a RHEL-family OS, the
-default provider is `Chef::Provider::Rundeck:Yum`, which installs from the
-official yum repository.
+##### Chef::Provider::Rundeck::Apt
+
+If you are on a Debian-family platform, by default Rundeck will be installed
+from the official Apt repository.
+
+##### Chef::Provider::Rundeck:Yum
+
+If you are on a RHEL-family platform, by default Rundeck will be installed
+from the official Yum repository.
+
+##### Chef::Provider::Rundeck
+
+If you are on neither of the above, Rundeck will be installed using the JAR
+launcher. In this case, the `version` attribute is required as there is no
+way to determine what version is the latest. You can force either of the above
+platforms to install using the JAR launcher by manually setting the provider:
+
+```ruby
+rundeck 'name'
+  provider :rundeck
+  ...
+end
+```
 
 ### rundeck_project
 
