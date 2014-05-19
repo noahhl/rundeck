@@ -62,9 +62,6 @@ The following cookbooks are required:
 * runit
 * yum
 
-In order to install the NGINX proxy site, you'll either need the `openresty` or
-`nginx` cookbook.
-
 ### OS
 
 The following platforms are supported and tested:
