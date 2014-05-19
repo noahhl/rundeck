@@ -7,11 +7,17 @@ orchestration and administration tool.
 Quick Start
 -----------
 
-The fastest way to get started is to customize the `rundeck.cli_password`,
-`rundeck.admin_password`, and `rundeck.ssh_key` node attributes and add
-`recipe[rundeck]` to you node's run list. Unfortunately this has some security
-issues due to the nature of storing passwords in node attributes. A better
-options overall is to create a wrapper cookbook. In your wrapper's `metadata.rb`
+The fastest way to get started is to customize the following node attributes: 
+* `rundeck.cli_password`
+* `rundeck.admin_password`
+* `rundeck.ssh_key` 
+
+ then add the following to your node's run list. 
+* `recipe[rundeck]` 
+
+Unfortunately this has some securityissues due to the nature of storing passwords in node attributes (see below). 
+
+A better option is to create a wrapper cookbook. In your wrapper's `metadata.rb`
 add:
 
 ```ruby
