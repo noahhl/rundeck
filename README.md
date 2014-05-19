@@ -139,14 +139,20 @@ rundeck 'name' do
 end
 ```
 
+#### Core attributes
+
 * `node_name` – Name of the Rundeck server node. *(name_attribute)*
 * `version` – Version of Rundeck to install. *(default: node['rundeck']['version'])*
 * `launcher_url` – Download URL if using the JAR launcher installation method. *(default: node['rundeck']['launcher_url'])*
 * `service_name` – Runit service name. Must be unique on the system. *(default: rundeck)*
 
+# Path attributes
+
 * `path` – Base path for Rundeck data. *(default: node['rundeck']['path'])*
 * `config_path` – Path for Rundeck configuration. *(default: node['rundeck']['config_path'])*
 * `log_path` – Path for Rundeck log files. *(default: node['rundeck']['log_path'])*
+
+# Template attributes
 
 * `log4j_config` – Template for log4j.properties. *(template, default_source: log4j.properties.erb)*
 * `jaas_config` – Template for jaas-loginmodule.conf. *(template, default_source: jaas-loginmodule.conf.erb)*
@@ -155,6 +161,8 @@ end
 * `rundeck_config` – Template for rundeck-config.properties. *(template, default_source: rundeck-config.properties.erb)*
 * `realm_config` – Template for realm.properties. *(template, default_source: realm.properties.erb)*
 * `enable_default_acls` – Enable default ACLs for admin and cli groups. *(default: true)*
+
+# Configuration attributes
 
 * `user` – User to run Rundeck as. *(default: node['rundeck']['user'])*
 * `group` – Group to run Rundeck as. *(default: node['rundeck']['group'])*
@@ -167,9 +175,13 @@ end
 * `external_scheme` – Scheme to use when creating links. Set to HTTPS if you are using a TLS proxy. *(default: node['rundeck']['external_scheme'])*
 * `email` – Email settings. *(option_collector, default: node['rundeck']['email'])*
 
+# CLI attributes
+
 * `cli_user` – Username for Rundeck CLI tools. *(default: cli)*
 * `cli_password` – Password for Rundeck CLI tools. *(required, unless cli_user is false)*
 * `create_cli_user` – Create Rundeck user for CLI tools. *(default: true)*
+
+# SSH attributes
 
 * `ssh_user` – Username Rundeck will SSH to remote servers as. *(default: node['rundeck']['ssh_user'])*
 * `ssh_key` – SSH key Rundeck will SSH to remote servers with.
@@ -182,6 +194,107 @@ Debian-family OS, the default provider is `Chef::Provider::Rundeck::Apt`, which
 installs from the official apt repository. If you are on a RHEL-family OS, the
 default provider is `Chef::Provider::Rundeck:Yum`, which installs from the
 official yum repository.
+
+### rundeck_project
+
+The `rundeck_project` resource creates a Rundeck project. It is a subresource
+of `rundeck`.
+
+```ruby
+rundeck_project 'name' do
+  executor 'stub'
+  file_copier 'stub'
+end
+```
+
+* `project_name` – Name of the project. *(name_attribute)*
+* `''` – Project template. *([template](https://github.com/poise/poise#template-content), default_source: project.properties.erb)*
+* `ssh_authentication` – SSH authentication mode. One of: `privateKey`, `password`. *(default: privateKey)*
+* `ssh_key` – SSH key Rundeck will SSH to remote servers with. *(deafault: parent.path/.ssh/id_rsa)*
+* `executor` – Execution mode. One of: `jsch-ssh`, `stub`. *(default: jsch-ssh)*
+* `file_copier` – File copier mode. One of: `jsch-scp`, `stub`. *(default: jsch-scp)*
+
+### rundeck_node_source_file
+
+The `rundeck_node_source_file` creates a node catalog file for a Rundeck project.
+It is a subresource of `rundeck_project`.
+
+```ruby
+rundeck_node_source_file 'name' do
+  query 'chef_environment:prod AND tags:enabled'
+end
+```
+
+* `''` – Source properties template. *([template](https://github.com/poise/poise#template-content), default_source: source_file.properties.erb)*
+* `resources_xml` – Node catalog template. *([template](https://github.com/poise/poise#template-content), default_source: resources.xml.erb)*
+* `query` – Chef search query to generate node catalog. *(default: chef_environment:node.chef_environment)*
+* `ssh_user` – Username Rundeck will SSH to remote servers as. *(default: parent.parent.ssh_user)*
+
+### rundeck_job
+
+The `rundeck_job` resource creates a Rundeck job. It is a subresource of
+`rundeck_project`.
+
+```ruby
+rundeck_job 'name' do
+  source 'job.yml.erb'
+end
+```
+
+* `job_name` – Name of the job. *(name_attribute)*
+* `format` – Job format. One of: `xml`, `yaml`. *(default: yaml)*
+* `''` – Job template. *([template](https://github.com/poise/poise#template-content), required)*
+
+**NOTE**: XML format support not currently available.
+
+### rundeck_user
+
+The `rundeck_user` resource creates a Rundeck user. These are used to authenticate
+to the Rundeck web interface and API. It is a subresource of `rundeck`.
+
+```ruby
+rundeck_user 'name' do
+  password 'whatmeworry'
+end
+```
+
+* `username` – User name. *(name_attribute)*
+* `password` – Password data. See below for more information. *(required)*
+* `format` – Password format. See below for more information. One of: `md5`, `crypt`, `plain`. *(default: md5)*
+* `roles` – Array of roles to add the user to.
+
+Thee modes are available for password obfuscation: unsalted MD5, crypt, and
+plain text. If you use `format 'md5'` or `format 'crypt'`, you should pass
+`password` in plain text and the resource will obfuscate the password before
+writing to the file. The recommended way to handle passwords is to MD5-hash
+the password yourself and use the `plain` format like so:
+
+```ruby
+rundeck_user 'name' do
+  format 'plain'
+  password 'MD5:'+hash
+end
+```
+
+You are highly encouraged to store the hash just like you would a password, as
+unsalted MD5 is trivially crackable in most cases. [The citadel cookbook](https://github.com/balanced-cookbooks/citadel)
+and [chef-vault](https://github.com/Nordstrom/chef-vault) are both good options
+for secure storage. Even with this, do not use the same password as you do for
+other websites.
+
+### rundeck_acl
+
+The `rundeck_acl` resource creates an ACL configuration for Rundeck. It is a
+subresource of `rundeck`.
+
+```ruby
+rundeck_acl 'name' do
+  source 'myacl.erb'
+end
+```
+
+* `acl_name` – ACL name. *(name_attribute)*
+* `''` – ACL template. *([template](https://github.com/poise/poise#template-content), required)*
 
 License
 -------
