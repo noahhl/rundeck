@@ -146,13 +146,13 @@ end
 * `launcher_url` – Download URL if using the JAR launcher installation method. *(default: node['rundeck']['launcher_url'])*
 * `service_name` – Runit service name. Must be unique on the system. *(default: rundeck)*
 
-# Path attributes
+##### Path attributes
 
 * `path` – Base path for Rundeck data. *(default: node['rundeck']['path'])*
 * `config_path` – Path for Rundeck configuration. *(default: node['rundeck']['config_path'])*
 * `log_path` – Path for Rundeck log files. *(default: node['rundeck']['log_path'])*
 
-# Template attributes
+##### Template attributes
 
 * `log4j_config` – Template for log4j.properties. *(template, default_source: log4j.properties.erb)*
 * `jaas_config` – Template for jaas-loginmodule.conf. *(template, default_source: jaas-loginmodule.conf.erb)*
@@ -162,7 +162,7 @@ end
 * `realm_config` – Template for realm.properties. *(template, default_source: realm.properties.erb)*
 * `enable_default_acls` – Enable default ACLs for admin and cli groups. *(default: true)*
 
-# Configuration attributes
+##### Configuration attributes
 
 * `user` – User to run Rundeck as. *(default: node['rundeck']['user'])*
 * `group` – Group to run Rundeck as. *(default: node['rundeck']['group'])*
@@ -175,13 +175,13 @@ end
 * `external_scheme` – Scheme to use when creating links. Set to HTTPS if you are using a TLS proxy. *(default: node['rundeck']['external_scheme'])*
 * `email` – Email settings. *(option_collector, default: node['rundeck']['email'])*
 
-# CLI attributes
+##### CLI attributes
 
 * `cli_user` – Username for Rundeck CLI tools. *(default: cli)*
 * `cli_password` – Password for Rundeck CLI tools. *(required, unless cli_user is false)*
 * `create_cli_user` – Create Rundeck user for CLI tools. *(default: true)*
 
-# SSH attributes
+##### SSH attributes
 
 * `ssh_user` – Username Rundeck will SSH to remote servers as. *(default: node['rundeck']['ssh_user'])*
 * `ssh_key` – SSH key Rundeck will SSH to remote servers with.
