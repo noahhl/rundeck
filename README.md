@@ -127,7 +127,7 @@ Recipes
 
 ### default
 
-The default recipe (`recipe[rundeck]`) installs an configures a Rundeck server
+The default recipe (`recipe[rundeck]`) installs and configures a Rundeck server
 and optionally a single admin user. As noted above, you are highly encouraged
 to not use this recipe directly, in favor of making a wrapper cookbook and using
 the underlying resources yourself. This is because the recipe is configured
