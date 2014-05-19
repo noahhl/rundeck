@@ -329,6 +329,48 @@ end
 * `acl_name` – ACL name. *(name_attribute)*
 * `''` – ACL template. *([template](https://github.com/poise/poise#template-content), required)*
 
+Example
+-------
+
+An example of a small wrapper cookbook. All you need is two files, the cookbook
+metadata and a recipe.
+
+### metadata.rb
+
+```ruby
+name 'mycompany-rundeck'
+version '1.0.0'
+depends 'rundeck'
+depends 'citadel'
+```
+
+### recipes/default.rb
+
+```ruby
+rundeck node['rundeck']['node_name'] do
+  cli_password citadel['rundeck/cli_password']
+  ssh_key citadel['deploy_key/deploy.pem']
+end
+
+rundeck_user 'asmithee' do
+  format 'plain'
+  password 'MD5:'+citadel['rundeck/asmithee_password']
+  roles %w{admin user}
+end
+
+rundeck_project 'mycompany' do
+  rundeck_node_source_file 'mycompany'
+
+  rundeck_job 'deploy' do
+    source 'deploy.yml.erb'
+  end
+
+  rundeck_job 'migrate' do
+    source 'migrate.yml.erb'
+  end
+end
+```
+
 License
 -------
 
