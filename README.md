@@ -98,11 +98,12 @@ Recipes
 ### default
 
 The default recipe (`recipe[rundeck]`) installs and configures a Rundeck server
-and optionally a single admin user. As noted above, you are highly encouraged
-to not use this recipe directly, in favor of making a wrapper cookbook and using
-the underlying resources yourself. This is because the recipe is configured
-using node attributes, and in a chef-server/client setup this is insecure. If
-you are using chef-solo, this recipe is believed to be safe at this time.
+and optionally creates a single admin user. As noted above, you are highly
+encouraged to not use this recipe directly, in favor of making a wrapper
+cookbook and using the underlying resources yourself. This is because the recipe
+is configured using node attributes, and in a chef-server/client setup this is
+insecure. If you are using chef-solo, this recipe is believed to be safe at this
+time.
 
 To use the recipe, `node['rundeck']['cli_password']` and
 `node['rundeck']['ssh_key']` are required. `node['rundeck']['admin_password']`
