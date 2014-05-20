@@ -141,12 +141,12 @@ end
 
 ##### Template attributes
 
-* `log4j_config` – Template for log4j.properties. *(template, default_source: log4j.properties.erb)*
-* `jaas_config` – Template for jaas-loginmodule.conf. *(template, default_source: jaas-loginmodule.conf.erb)*
-* `profile_config` – Template for bash profile config. *(template, default_source: profile.erb)*
-* `framework_config` – Template for framework.properties. *(template, default_source: framework.properties.erb)*
-* `rundeck_config` – Template for rundeck-config.properties. *(template, default_source: rundeck-config.properties.erb)*
-* `realm_config` – Template for realm.properties. *(template, default_source: realm.properties.erb)*
+* `log4j_config` – Template for log4j.properties. *([template](https://github.com/poise/poise#template-content), default_source: log4j.properties.erb)*
+* `jaas_config` – Template for jaas-loginmodule.conf. *([template](https://github.com/poise/poise#template-content), default_source: jaas-loginmodule.conf.erb)*
+* `profile_config` – Template for bash profile config. *([template](https://github.com/poise/poise#template-content), default_source: profile.erb)*
+* `framework_config` – Template for framework.properties. *([template](https://github.com/poise/poise#template-content), default_source: framework.properties.erb)*
+* `rundeck_config` – Template for rundeck-config.properties. *([template](https://github.com/poise/poise#template-content), default_source: rundeck-config.properties.erb)*
+* `realm_config` – Template for realm.properties. *([template](https://github.com/poise/poise#template-content), default_source: realm.properties.erb)*
 * `enable_default_acls` – Enable default ACLs for admin and cli groups. *(default: true)*
 
 ##### Configuration attributes
