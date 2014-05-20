@@ -7,12 +7,14 @@ orchestration and administration tool.
 Quick Start
 -----------
 
-The fastest way to get started is to customize the following node attributes:
-* `rundeck.cli_password`
-* `rundeck.admin_password`
-* `rundeck.ssh_key`
+The fastest way to get started is to set the following node attributes:
 
- then add the following to your node's run list.
+* `node['rundeck']['cli_password']` – Password for CLI tools user.
+* `node['rundeck']['admin_password']` – Password for default admin user.
+* `node['rundeck']['ssh_key']` – SSH private key to log in to target servers.
+
+Then add the following to your node's run list:
+
 * `recipe[rundeck]`
 
 Unfortunately this has some security issues due to the nature of storing passwords in node attributes (see below).
