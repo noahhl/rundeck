@@ -17,45 +17,10 @@ Then add the following to your node's run list:
 
 * `recipe[rundeck]`
 
-Unfortunately this has some security issues due to the nature of storing passwords in node attributes (see below).
-
-A better option is to create a wrapper cookbook. In your wrapper's `metadata.rb`
-add:
-
-```ruby
-depends 'rundeck'
-```
-
-And then in your wrapper recipe:
-
-```ruby
-rundeck node['rundeck']['node_name'] do
-  # Get these from somewhere secure like chef-vault or citadel.
-  cli_password 'password'
-  ssh_key '-----BEGIN RSA PRIVATE KEY-----...'
-end
-
-rundeck_user 'myuser' do
-  password 'admin' # As above, should come from somewhere secure.
-  roles %w{admin user}
-end
-```
-
-To setup a simple project and job:
-
-```ruby
-rundeck_project 'myproj'
-
-rundeck_node_source_file 'myproj'
-
-rundeck_job 'myjob' do
-  source 'myjob.yml.erb'
-end
-```
-
-And then add a YAML template containing your job information. See [the Rundeck
-documentation](http://rundeck.org/docs/man5/job-yaml.html) for more information
-about the required data and format.
+**WARNING**: This type of setup is dangerously insecure if you are using
+chef-server/client. See the [Recipes section](#default) for more information
+about using the default recipe. See the [Example section](#example) for an
+alternative usage that is more secure.
 
 Requirements
 ------------
@@ -337,8 +302,8 @@ end
 Example
 -------
 
-An example of a small wrapper cookbook. All you need is two files, the cookbook
-metadata and a recipe.
+An example of a small wrapper cookbook. All you need is three files, the cookbook
+metadata, a recipe, and a template for the job.
 
 ### metadata.rb
 
@@ -370,16 +335,28 @@ rundeck_project 'mycompany' do
   # Create a node source using all Chef nodes in the same environment
   rundeck_node_source_file 'mycompany'
 
-  # Create two jobs from template files
+  # Create a job from a template file
   rundeck_job 'deploy' do
     source 'deploy.yml.erb'
   end
 
-  rundeck_job 'migrate' do
-    source 'migrate.yml.erb'
-  end
+  # Create more jobs here as needed ...
 end
 ```
+
+### templates/default/deploy.yml.erb
+
+```yaml
+- loglevel: INFO
+  sequence:
+    keepgoing: false
+    strategy: node-first
+    commands:
+    - exec: cd /srv/myapp && make deploy
+```
+
+See [the Rundeck documentation](http://rundeck.org/docs/man5/job-yaml.html) for
+more information about the required data and format for jobs.
 
 License
 -------
