@@ -19,47 +19,41 @@
 #
 
 default['rundeck']['version'] = nil # Use latest by default
-default['rundeck']['launcher_url'] = 'https://download.rundeck.org/jar/rundeck-launcher-%{version}.jar'
+default['rundeck']['launcher_url'] = 'https://s3.amazonaws.com/download.rundeck.org/jar/rundeck-launcher-%{version}.jar'
 default['rundeck']['path'] = '/var/lib/rundeck'
 default['rundeck']['config_path'] = '/etc/rundeck'
 default['rundeck']['log_path'] = '/var/log/rundeck'
 default['rundeck']['user'] = 'rundeck'
 default['rundeck']['group'] = 'rundeck'
 default['rundeck']['jvm_options'] = ''
+default['rundeck']['ssh_user'] = 'rundeck'
 
 # Framework configuration
-default['rundeck']['node_name']     = node.name
-default['rundeck']['port']          = 4440
-default['rundeck']['log4j_port']    = 4435
-default['rundeck']['public_rss']    = false
-default['rundeck']['logging_level'] = 'INFO'
-default['rundeck']['hostname']      = 'localhost'
+default['rundeck']['node_name'] = node.name
+default['rundeck']['port'] = 4440
+default['rundeck']['public_rss'] = false
+default['rundeck']['logging_level'] = 'INFO' # Is this useful? It is required to be set in imported jobs.
 
+# Nodes data
 default['rundeck']['nodes'] = []
 
-# Administrator data bag
-default['rundeck']['admin']['encrypted_data_bag'] = true
-default['rundeck']['admin']['data_bag']           = 'credentials'
-default['rundeck']['admin']['data_bag_id']        = 'rundeck'
-# For Solo runs with no data bags
-default['rundeck']['admin']['username']           = 'admin'
-default['rundeck']['admin']['password']           = 'a73e319b433528eaa646' # Override this!
-default['rundeck']['admin']['ssh_key']            = ''
+# DANGER, DANGER WILL ROBINSON
+# USE OF THESE ATTRIBUTES IS INSECURE
+# REALLY DON'T USE THEM
+default['rundeck']['cli_password'] = 'password'
+default['rundeck']['admin_password'] = nil
+default['rundeck']['ssh_key'] = nil
+# /DANGER ZONE
 
+# Email settings
+default['rundeck']['email']['hostname'] = 'localhost'
+default['rundeck']['email']['port'] = 25
+default['rundeck']['email']['username'] = nil
+default['rundeck']['email']['password'] = nil
+default['rundeck']['email']['from'] = 'undeck@example.com'
+default['rundeck']['email']['tls'] = false
 
-# Mail data bag
-default['rundeck']['mail'] = {
-  'hostname'    => 'localhost',
-  'port'        => 25,
-  'username'    => nil,
-  'password'    => nil,
-  'from'        => 'ops@example.com',
-  'tls'         => false
-}
-default['rundeck']['mail']['recipients_data_bag'] = 'users'
-default['rundeck']['mail']['recipients_query']    = 'notify:true'
-default['rundeck']['mail']['recipients_field']    = "['email']"
-
-default['rundeck']['proxy']['hostname'] = 'localhost'
-default['rundeck']['proxy']['port'] = 4440
-default['rundeck']['proxy']['scheme'] = 'http'
+# Proxy settings
+default['rundeck']['external_hostname'] = 'localhost'
+default['rundeck']['external_port'] = nil # Default is the same as port
+default['rundeck']['external_scheme'] = 'http'

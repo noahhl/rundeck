@@ -1,241 +1,370 @@
-chef-rundeck
-============
+Rundeck Cookbook
+================
 
-This is a Chef cookbook for the remote administration tool [Rundeck](http://rundeck.org). It installs the Rundeck
-package (either on deb or rpm format) and configures various aspects of the software.
+This is a Chef cookbook to install [Rundeck](http://rundeck.org/), an
+orchestration and administration tool.
 
-The latest and greatest revision of this cookbook will always be available
-at https://github.com/priestjim/chef-rundeck
-
-Requirements
-============
-
-Cookbooks
----------
-
-The following cookbooks are direct dependencies because they're used
-for common "default" functionality.
-
-* java
-* apt
-* yum
-* logrotate
-
-In order to install the Chef discovery service, you'll need the `supervisor`
-cookbook.
-
-In order to install the NGINX proxy site, you'll either need the `openresty` or
-`nginx` cookbook.
-
-Platform
---------
-
-The following platforms are supported and tested using Vagrant 1.2:
-
-* Ubuntu 12.04
-* CentOS 6.4
-
-Other Debian and RHEL family distributions are assumed to work.
-
-Chef Server
+Quick Start
 -----------
 
-The cookbook converges best on Chef installations >= 10.18.2
+The fastest way to get started is to set the following node attributes:
+
+* `node['rundeck']['cli_password']` – Password for CLI tools user.
+* `node['rundeck']['admin_password']` – Password for default admin user.
+* `node['rundeck']['ssh_key']` – SSH private key to log in to target servers.
+
+Then add the following to your node's run list:
+
+* `recipe[rundeck]`
+
+**WARNING**: This type of setup is dangerously insecure if you are using
+chef-server/client. See the [Recipes section](#default) for more information
+about using the default recipe. See the [Example section](#example) for an
+alternative usage that is more secure.
+
+Requirements
+------------
+
+### Cookbooks
+
+The following cookbooks are required:
+
+* apt
+* java
+* poise
+* runit
+* yum
+
+### OS
+
+The following platforms are supported and tested:
+
+* Ubuntu 12.04
+* CentOS 6.5
+
+### Chef
+
+This cookbook requires Chef 11 or higher.
 
 Attributes
-==========
+----------
 
-Attributes are split in files semantically:
+* `node['rundeck']['version']` – Version of Rundeck to install. *(default: latest)*
+* `node['rundeck']['launcher_url']` – Download URL if using the JAR launcher installation method. *(default: https://s3.amazonaws.com/download.rundeck.org/jar/rundeck-launcher-%{version}.jar)*
+* `node['rundeck']['path']` – Base path for Rundeck data. *(default: /var/lib/rundeck)*
+* `node['rundeck']['config_path']` – Path for Rundeck configuration. *(default: /etc/rundeck)*
+* `node['rundeck']['log_path']` – Path for Rundeck log files. *(default: /var/log/rundeck)*
+* `node['rundeck']['user']` – User to run Rundeck as. *(default: rundeck)*
+* `node['rundeck']['group']` – Group to run Rundeck as. *(default: rundeck)*
+* `node['rundeck']['jvm_options']` – Extra options to pass to the JVM.
+* `node['rundeck']['node_name']` – Name for the initial Rundeck node. *(default: node.name)*
+* `node['rundeck']['port']` – HTTP port for Rundeck. *(default: 4440)*
+* `node['rundeck']['public_rss']` – Enable unauthenticated access to RSS feeds. *(default: false)*
+* `node['rundeck']['logging_level']` – Default logging level for jobs. *(default: INFO)*
+* `node['rundeck']['ssh_user']` – Username Rundeck will SSH to remote servers as. *(default: rundeck)*
 
-## default.rb
+### Email settings
 
-* `node['rundeck']['deb_version']` - The Rundeck version to be installed for Debian-based distributions.
+* `node['rundeck']['email']['hostname']` – SMTP hostname. *(default: localhost)*
+* `node['rundeck']['email']['port']` – SMTP port. *(default: 25)*
+* `node['rundeck']['email']['username']` – SMTP username.
+* `node['rundeck']['email']['password']` – SMTP password.
 
-* `node['rundeck']['rpm_version']` - The Rundeck version to be installed for RPM-based distributions.
+### Proxy settings
 
-* `node['rundeck']['node_name']` - The Rundeck node name. Defaults to `node.name`
+These settings are used to customize how Rundeck generates links. This is useful
+both if you have a DNS name for your Rundeck server and if you are using some
+kind of reverse proxy server.
 
-* `node['rundeck']['node_name']` - The port Rundeck HTTP server runs on.
+* `node['rundeck']['external_hostname']` – Hostname to use when creating links. *(default: localhost)*
+* `node['rundeck']['external_port']` – Port to use when creating links. *(default: node['rundeck']['port'])*
+* `node['rundeck']['external_scheme']` – Scheme to use when creating links. Set to HTTPS if you are using a TLS proxy. *(default: http)*
 
-* `node['rundeck']['log4j_port']` - The Rundeck Log4J port.
+### Insecure settings
 
-* `node['rundeck']['public_rss']` - Enables an unauthenticated RSS feed for jobs.
+Three attributes are provided to set passwords/keys for the default recipe. As
+mentioned above, using these can be insecure with chef-server as all node
+attributes are visible to all nodes and users in Chef. It is highly recommended
+you do not use these, as a wrapper cookbook with a better secrets store is much
+safer:
 
-* `node['rundeck']['logging_level']` - The default logging level for Rundeck.
-
-* `node['rundeck']['admin']['encrypted_data_bag']` - Enables loading the Rundeck administrator
-  credentials using Chef encrypted data bags instead of simple ones.
-
-* `node['rundeck']['admin']['data_bag']` - The data bag name for the administrator credentials
-
-* `node['rundeck']['admin']['data_bag_id']` - The data bag item name for the administrator credentials
-
-* `node['rundeck']['admin']['username']` - Hardcoded administrator username in case data bags are not
-  available (i.e. chef-solo runs)
-
-* `node['rundeck']['admin']['password']` - Hardcoded administrator password in case data bags are not
-  available (i.e. chef-solo runs)
-
-* `node['rundeck']['admin']['ssh_key']` - Hardcoded administrator private SSH key in case data bags are not
-  available (i.e. chef-solo runs)
-
-* `node['rundeck']['mail']` - Hash with various SMTP parameters used by Rundeck for notifications.
-
-* `node['rundeck']['mail']['recipients_data_bag']` - The name of the data bag to be searched for recipients
-  of mails for administrative purposes.
-
-* `node['rundeck']['mail']['recipients_query']` - A standard Chef query to use for searching for administrative
-  contacts.
-
-* `node['rundeck']['mail']['recipients_field']` - Field to use for the administrative e-mail. Must be in standard hash
-  notation and will be eval'ed (i.e. "['email']")
-
-## chef.rb
-
-* `node['rundeck']['chef']['port']` - TCP port to run the chef-rundeck discovery service
-
-* `node['rundeck']['chef']['client_key']` - Hardcoded Chef client key in case data bags are not available
-
-* `node['rundeck']['chef']['port']` - Hardcoded Chef client name in case data bags are not available
-
-## ssh.rb
-
-* `node['rundeck']['ssh']['user']` - Default SSH user with whom Rundeck will login to the servers.
-
-* `node['rundeck']['ssh']['timeout']` - SSH connection timeout in milliseconds.
-
-* `node['rundeck']['ssh']['port']` - Default SSH port to connect to.
-
-## java.rb
-
-* `node['rundeck']['java']['enable_jmx']` - Defines a set of flags in order to enable JMX monitoring on the
-  Rundeck installation
-
-* `node['rundeck']['java']['allocated_memory']` - Defines the maximum heap memory available to Rundeck's JVM
-
-* `node['rundeck']['java']['thread_stack_size']` - Defines the default thread stack size for the Rundeck's JVM
-
-## proxy.rb
-
-* `node['rundeck']['proxy']['hostname']` - Defines the default hostname used in the NGINX proxy instance.
-
-* `node['rundeck']['proxy']['default']` - Set to true to enable the NGINX default server flags for the Rundeck
-  proxy virtual host.
+* `node['rundeck']['cli_password']` – CLI user password. *(default: password)*
+* `node['rundeck']['admin_password']` – Default admin user password.
+* `node['rundeck']['ssh_key']` – SSH private key.
 
 Recipes
-=======
+-------
 
-## default.rb
+### default
 
-The `default` recipe will install the official Rundeck package for your specific distribution and install various
-configuration files needed for Rundeck to operate. If you need SSL support, it would be better to use a reverse proxy for
-this (such us NGINX or Apache2) since Rundeck's SSL support requires various complicated steps (all hail Java).
+The default recipe (`recipe[rundeck]`) installs and configures a Rundeck server
+and optionally creates a single admin user. As noted above, you are highly
+encouraged to not use this recipe directly, in favor of making a wrapper
+cookbook and using the underlying resources yourself. This is because the recipe
+is configured using node attributes, and in a chef-server/client setup this is
+insecure. If you are using chef-solo, this recipe is believed to be safe at this
+time.
 
-Log rotation of Rundeck's and Chef-Rundeck's logs is managed by a `logrotate` job.
+To use the recipe, `node['rundeck']['cli_password']` and
+`node['rundeck']['ssh_key']` are required. `node['rundeck']['admin_password']`
+is optional, if present an admin user named `admin` will be created with the
+provided password.
 
-The `default` recipe will install and enable either a SYSV-standard service for Redhat and Debian based distributions
-or an Upstart service for Ubuntu installations.
+Resources
+---------
 
-The cookbook also needs a custom Rundeck user that will be used to execute remote jobs. You need to create the user before
-installing Rundeck and then define a passwordless RSA SSH key for the user in this cookbook's properties.
+### rundeck
 
-All credentials used are retrieved from:
+The `rundeck` resource installs and configures a Rundeck server.
 
-* An encrypted data bag if the `node['rundeck']['admin']['encrypted_data_bag']` attribute is enabled
-* A simple data bag otherwise
-* In case there is no data bag defined, administrative attributes are retrieved from node attributes
+```ruby
+rundeck 'name' do
+  version '2.1.1'
+  port 8080
+  cli_password 'password'
+  ssh_key '-----BEGIN RSA PRIVATE KEY-----...'
+end
+```
 
-## chef.rb
+#### Core attributes
 
-The `chef` recipe will install the `chef-rundeck` gem using the Ruby bundled with the Chef omnibus package. That way, no
-extra dependencies occur (i.e. rbenv or rvm or a packaged ruby).
+* `node_name` – Name of the Rundeck server node. *(name_attribute)*
+* `version` – Version of Rundeck to install. *(default: node['rundeck']['version'])*
+* `launcher_url` – Download URL if using the JAR launcher installation method. *(default: node['rundeck']['launcher_url'])*
+* `service_name` – Runit service name. Must be unique on the system. *(default: rundeck)*
 
-Supervisor from the `supervisor` cookbook is used to start and supervise the service.
+##### Path attributes
 
-As with `default`, all credentials (Chef client key and client name) used are retrieved from:
+* `path` – Base path for Rundeck data. *(default: node['rundeck']['path'])*
+* `config_path` – Path for Rundeck configuration. *(default: node['rundeck']['config_path'])*
+* `log_path` – Path for Rundeck log files. *(default: node['rundeck']['log_path'])*
 
-* An encrypted data bag if the `node['rundeck']['admin']['encrypted_data_bag']` attribute is enabled
-* A simple data bag otherwise
-* In case there is no data bag defined, administrative attributes are retrieved from node attributes
+##### Template attributes
 
-## proxy.rb
+* `log4j_config` – Template for log4j.properties. *([template](https://github.com/poise/poise#template-content), default_source: log4j.properties.erb)*
+* `jaas_config` – Template for jaas-loginmodule.conf. *([template](https://github.com/poise/poise#template-content), default_source: jaas-loginmodule.conf.erb)*
+* `profile_config` – Template for bash profile config. *([template](https://github.com/poise/poise#template-content), default_source: profile.erb)*
+* `framework_config` – Template for framework.properties. *([template](https://github.com/poise/poise#template-content), default_source: framework.properties.erb)*
+* `rundeck_config` – Template for rundeck-config.properties. *([template](https://github.com/poise/poise#template-content), default_source: rundeck-config.properties.erb)*
+* `realm_config` – Template for realm.properties. *([template](https://github.com/poise/poise#template-content), default_source: realm.properties.erb)*
+* `enable_default_acls` – Enable default ACLs for admin and cli groups. *(default: true)*
 
-The `proxy` recipe will install an NGINX configuration file that exposes Rundeck through a reverse proxy HTTP interface.
+##### Configuration attributes
 
-Data bag format
-===============
+* `user` – User to run Rundeck as. *(default: node['rundeck']['user'])*
+* `group` – Group to run Rundeck as. *(default: node['rundeck']['group'])*
+* `jvm_options` – Extra options to pass to the JVM. *(default: node['rundeck']['jvm_options'])*
+* `port` – HTTP port for Rundeck. *(default: node['rundeck']['port'])*
+* `public_rss` – Enable unauthenticated access to RSS feeds. *(default: node['rundeck']['public_rss'])*
+* `logging_level` – Default logging level for jobs. *(default: node['rundeck']['logging_level'])*
+* `external_host` – Hostname to use when creating links. *(default: node['rundeck']['external_host'])*
+* `external_port` – Port to use when creating links. *(default: node['rundeck']['external_port'])*
+* `external_scheme` – Scheme to use when creating links. Set to HTTPS if you are using a TLS proxy. *(default: node['rundeck']['external_scheme'])*
+* `email` – Email settings. *(option_collector, default: node['rundeck']['email'])*
 
-The Rundeck cookbook requires some data to be available in data bags. Depending on the value of
-`node['rundeck']['admin']['encrypted_data_bag']`, the data bag data will be loaded via encrypted data bag
-methods or plain. You can select the data bag name and ID via the `node['rundeck']['admin']['data_bag']`
-and `node['rundeck']['admin']['data_bag_id']` attributes. The following attributes must be present in the
-selected data bag:
+##### CLI attributes
 
-* `username`: Used as the default administrator's username created during the initial installation of Rundeck.
-* `password`: Used the default administrator's password created during the initial installation of Rundeck.
-* `ssh_key`: Used in place of the Rundeck SSH user's RSA private key.
+* `cli_user` – Username for Rundeck CLI tools. *(default: cli)*
+* `cli_password` – Password for Rundeck CLI tools. *(required, unless cli_user is false)*
+* `create_cli_user` – Create Rundeck user for CLI tools. *(default: true)*
 
-If you are using the `rundeck::chef` recipe, the following must be present in the data bag too:
+##### SSH attributes
 
-* `client_key`: The Chef client's private key in PEM format.
-* `client_name`: The Chef client's name.
+* `ssh_user` – Username Rundeck will SSH to remote servers as. *(default: node['rundeck']['ssh_user'])*
+* `ssh_key` – SSH key Rundeck will SSH to remote servers with.
 
-In addition to administrative attributes, data bags are used in mail recipient search. The search query searches among the
-`node['rundeck']['mail']['recipients_data_bag']` data bag using a standard Chef query defined in
-`node['rundeck']['mail']['recipients_query']` and from the results retrieves the field
-defined in `node['rundeck']['mail']['recipients_field']` using standard Ruby eval.
-So, if you are looking for the `user['notifications']['email']` field in your data bags
-for your mail recipients, you should define it as:
+#### Providers
 
-    node['rundeck']['mail']['recipients_field'] = "['notifications']['email']"
+##### Chef::Provider::Rundeck::Apt
 
-LWRP
-====
+If you are on a Debian-family platform, by default Rundeck will be installed
+from the official Apt repository.
 
-## user
+##### Chef::Provider::Rundeck:Yum
 
-The cookbook includes the `rundeck_user` LWRP. The LWRP can be used to create users
-in Rundeck (see http://rundeck.org/docs/administration/authentication.html#realm.properties) through the standard
-`realm.properties` file. Only MD5 and CRYPT encryption is supported as an encryption scheme, along with plain-text.
+If you are on a RHEL-family platform, by default Rundeck will be installed
+from the official Yum repository.
 
-The following actions are supported:
+##### Chef::Provider::Rundeck
 
-* `create` - Creates a Rundeck user if it does not exist already.
-* `update` - Updates a Rundeck user.
-* `delete` - Removes a Rundeck user.
+If you are on neither of the above, Rundeck will be installed using the JAR
+launcher. In this case, the `version` attribute is required as there is no
+way to determine what version is the latest. You can force either of the above
+platforms to install using the JAR launcher by manually setting the provider:
 
-The following attributes are used in the LWRP:
+```ruby
+rundeck 'name'
+  provider :rundeck
+  ...
+end
+```
 
-* `name` - The actual Rundeck username.
-* `password` - The password in plain text.
-* `roles` - The Rundeck roles that this user is a member of.
-* `encryption` - One of `crypt`, `md5`, `plain`.
+### rundeck_project
 
-The LWRP can be used like
+The `rundeck_project` resource creates a Rundeck project. It is a subresource
+of `rundeck`.
 
-    rundeck_user 'ops' do
-      password '123abc'
-      encryption 'md5'
-      roles %w{ user admin architect deploy build }
-      action :create
-    end
+```ruby
+rundeck_project 'name' do
+  executor 'stub'
+  file_copier 'stub'
+end
+```
 
-Usage
-=====
+* `project_name` – Name of the project. *(name_attribute)*
+* `''` – Project template. *([template](https://github.com/poise/poise#template-content), default_source: project.properties.erb)*
+* `ssh_authentication` – SSH authentication mode. One of: `privateKey`, `password`. *(default: privateKey)*
+* `ssh_key` – SSH key Rundeck will SSH to remote servers with. *(deafault: parent.path/.ssh/id_rsa)*
+* `executor` – Execution mode. One of: `jsch-ssh`, `stub`. *(default: jsch-ssh)*
+* `file_copier` – File copier mode. One of: `jsch-scp`, `stub`. *(default: jsch-scp)*
 
-Include the recipe on your node or role. Modify the
-attributes as required in a role cookbook to change how various
-configuration is applied per the attributes section above.
+### rundeck_node_source_file
 
-If you need to alter the location of various cookbook_file
-directives, use `chef_rewind`.
+The `rundeck_node_source_file` creates a node catalog file for a Rundeck project.
+It is a subresource of `rundeck_project`.
 
-License and Author
-==================
+```ruby
+rundeck_node_source_file 'name' do
+  query 'chef_environment:prod AND tags:enabled'
+end
+```
 
-- Author:: Panagiotis Papadomitsos (<pj@ezgr.net>)
+* `''` – Source properties template. *([template](https://github.com/poise/poise#template-content), default_source: source_file.properties.erb)*
+* `resources_xml` – Node catalog template. *([template](https://github.com/poise/poise#template-content), default_source: resources.xml.erb)*
+* `query` – Chef search query to generate node catalog. *(default: chef_environment:node.chef_environment)*
+* `ssh_user` – Username Rundeck will SSH to remote servers as. *(default: parent.parent.ssh_user)*
 
-Copyright 2013, Panagiotis Papadomitsos
+### rundeck_job
+
+The `rundeck_job` resource creates a Rundeck job. It is a subresource of
+`rundeck_project`.
+
+```ruby
+rundeck_job 'name' do
+  source 'job.yml.erb'
+end
+```
+
+* `job_name` – Name of the job. *(name_attribute)*
+* `format` – Job format. One of: `xml`, `yaml`. *(default: yaml)*
+* `''` – Job template. *([template](https://github.com/poise/poise#template-content), required)*
+
+**NOTE**: XML format support not currently available.
+
+### rundeck_user
+
+The `rundeck_user` resource creates a Rundeck user. These are used to authenticate
+to the Rundeck web interface and API. It is a subresource of `rundeck`.
+
+```ruby
+rundeck_user 'name' do
+  password 'whatmeworry'
+end
+```
+
+* `username` – User name. *(name_attribute)*
+* `password` – Password data. See below for more information. *(required)*
+* `format` – Password format. See below for more information. One of: `md5`, `crypt`, `plain`. *(default: md5)*
+* `roles` – Array of roles to add the user to.
+
+Thee modes are available for password obfuscation: unsalted MD5, crypt, and
+plain text. If you use `format 'md5'` or `format 'crypt'`, you should pass
+`password` in plain text and the resource will obfuscate the password before
+writing to the file. The recommended way to handle passwords is to MD5-hash
+the password yourself and use the `plain` format like so:
+
+```ruby
+rundeck_user 'name' do
+  format 'plain'
+  password 'MD5:'+hash
+end
+```
+
+You are highly encouraged to store the hash just like you would a password, as
+unsalted MD5 is trivially crackable in most cases. [The citadel cookbook](https://github.com/balanced-cookbooks/citadel)
+and [chef-vault](https://github.com/Nordstrom/chef-vault) are both good options
+for secure storage. Even with this, do not use the same password as you do for
+other websites.
+
+### rundeck_acl
+
+The `rundeck_acl` resource creates an ACL configuration for Rundeck. It is a
+subresource of `rundeck`.
+
+```ruby
+rundeck_acl 'name' do
+  source 'myacl.erb'
+end
+```
+
+* `acl_name` – ACL name. *(name_attribute)*
+* `''` – ACL template. *([template](https://github.com/poise/poise#template-content), required)*
+
+Example
+-------
+
+An example of a small wrapper cookbook. All you need is three files, the cookbook
+metadata, a recipe, and a template for the job.
+
+### metadata.rb
+
+```ruby
+name 'mycompany-rundeck'
+version '1.0.0'
+depends 'rundeck'
+depends 'citadel'
+```
+
+### recipes/default.rb
+
+```ruby
+# Install Rundeck
+rundeck node['rundeck']['node_name'] do
+  cli_password citadel['rundeck/cli_password']
+  ssh_key citadel['deploy_key/deploy.pem']
+end
+
+# Create an admin user for ourselves
+rundeck_user 'asmithee' do
+  format 'plain'
+  password 'MD5:'+citadel['rundeck/asmithee_password']
+  roles %w{admin user}
+end
+
+# Create a project for general purpose jobs
+rundeck_project 'mycompany' do
+  # Create a node source using all Chef nodes in the same environment
+  rundeck_node_source_file 'mycompany'
+
+  # Create a job from a template file
+  rundeck_job 'deploy' do
+    source 'deploy.yml.erb'
+  end
+
+  # Create more jobs here as needed ...
+end
+```
+
+### templates/default/deploy.yml.erb
+
+```yaml
+- loglevel: INFO
+  sequence:
+    keepgoing: false
+    strategy: node-first
+    commands:
+    - exec: cd /srv/myapp && make deploy
+```
+
+See [the Rundeck documentation](http://rundeck.org/docs/man5/job-yaml.html) for
+more information about the required data and format for jobs.
+
+License
+-------
+
+Copyright 2013-2014, Panagiotis Papadomitsos
+
+Copyright 2014, Balanced, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

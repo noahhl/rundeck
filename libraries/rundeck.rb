@@ -44,21 +44,20 @@ class Chef
     attribute(:group, kind_of: String, default: lazy { node['rundeck']['group'] })
     attribute(:jvm_options, kind_of: String, default: lazy { node['rundeck']['jvm_options'] })
     attribute(:port, kind_of: [String, Integer], default: lazy { node['rundeck']['port'] })
-    attribute(:log4j_port, kind_of: [String, Integer], default: lazy { node['rundeck']['log4j_port'] })
     attribute(:public_rss, equal_to: [true, false], default: lazy { node['rundeck']['public_rss'] })
     attribute(:logging_level, kind_of: String, default: lazy { node['rundeck']['logging_level'] })
-    attribute(:hostname, kind_of: String, default: lazy { node['rundeck']['hostname'] })
-
-    attribute(:proxy_port, kind_of: [String, Integer], default: lazy { node['rundeck']['proxy']['port'] })
-    attribute(:proxy_host, kind_of: String, default: lazy { node['rundeck']['proxy']['hostname'] })
-    attribute(:proxy_scheme, kind_of: String, default: lazy { node['rundeck']['proxy']['scheme'] })
+    attribute(:external_port, kind_of: [String, Integer], default: lazy { node['rundeck']['external_port'] || port })
+    attribute(:external_host, kind_of: String, default: lazy { node['rundeck']['external_hostname'] })
+    attribute(:external_scheme, kind_of: String, default: lazy { node['rundeck']['external_scheme'] })
+    attribute(:email, option_collector: true, default: lazy { node['rundeck']['mail'] || node['rundeck']['email'] })
 
     # CLI usage
     attribute(:cli_user, kind_of: [String, FalseClass], default: 'cli')
     attribute(:cli_password, kind_of: String, required: true)
     attribute(:create_cli_user, equal_to: [true, false], default: true)
+
     # SSH Options
-    attribute(:ssh_user, kind_of: String, default: 'rundeck')
+    attribute(:ssh_user, kind_of: String, default: lazy { node['rundeck']['ssh_user'] })
     attribute(:ssh_key, kind_of: String)
 
     # Only used with the JAR-based installer
@@ -189,7 +188,7 @@ class Chef
 
     def download_jar
       remote_file new_resource.jar_path do
-        source "https://s3.amazonaws.com/download.rundeck.org/jar/rundeck-launcher-#{new_resource.version}.jar"
+        source new_resource.launcher_url
         owner 'root'
         group 'root'
         mode '600'

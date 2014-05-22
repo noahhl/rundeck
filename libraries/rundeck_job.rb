@@ -118,6 +118,7 @@ class Chef
     private
 
     def rd_jobs(*arguments)
+      Chef::Log.warn("No CLI user is set, rd-jobs is likely to fail") unless new_resource.parent.parent.cli_user && !new_resource.parent.parent.cli_user.empty?
       shell_out!(['rd-jobs']+arguments, environment: {'RDECK_BASE' => new_resource.parent.parent.path})
     end
 

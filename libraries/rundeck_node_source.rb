@@ -39,7 +39,7 @@ class Chef
     attribute(:resources_xml, template: true, default_source: 'resources.xml.erb')
     attribute(:query, kind_of: String, default: lazy { "chef_environment:#{node.chef_environment}" })
     attribute(:limit, kind_of: Integer)
-    attribute(:username, kind_of: String, default: 'rundeck')
+    attribute(:username, kind_of: String, default: lazy { parent.parent.ssh_user })
 
     def path
       ::File.join(parent.project_path, 'etc', 'resources.xml')
@@ -73,11 +73,8 @@ class Chef
           kernel_release: %w{kernel release},
         })
       end
-      if limit.nil?
-        nodes
-      else
-        nodes.slice(0, limit)
-      end
+      nodes = nodes.take(limit) if limit
+      nodes
     end
   end
 
