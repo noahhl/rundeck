@@ -47,8 +47,8 @@ class Chef
     end
 
     def nodes
-      if !:manual_nodes.empty?
-        nodes = :manual_nodes
+      if !manual_nodes.empty?
+        nodes = manual_nodes
       elsif !node['rundeck']['nodes'].empty?
         nodes = node['rundeck']['nodes']
       elsif Chef::Config[:solo]
