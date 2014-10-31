@@ -40,15 +40,15 @@ class Chef
     attribute(:query, kind_of: String, default: lazy { "chef_environment:#{node.chef_environment}" })
     attribute(:limit, kind_of: Integer)
     attribute(:username, kind_of: String, default: lazy { parent.parent.ssh_user })
-    attribute(:nodes, kind_of: Array, default: [])
+    attribute(:manual_nodes, kind_of: Array, default: [])
 
     def path
       ::File.join(parent.project_path, 'etc', 'resources.xml')
     end
 
     def nodes
-      if !:nodes.empty?
-        nodes = :nodes
+      if !:manual_nodes.empty?
+        nodes = :manual_nodes
       elsif !node['rundeck']['nodes'].empty?
         nodes = node['rundeck']['nodes']
       elsif Chef::Config[:solo]
