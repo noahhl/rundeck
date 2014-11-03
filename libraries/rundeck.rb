@@ -49,7 +49,7 @@ class Chef
     attribute(:external_port, kind_of: [String, Integer], default: lazy { node['rundeck']['external_port'] || port })
     attribute(:external_host, kind_of: String, default: lazy { node['rundeck']['external_hostname'] })
     attribute(:external_scheme, kind_of: String, default: lazy { node['rundeck']['external_scheme'] })
-    attribute(:email, option_collector: true, default: lazy { node['rundeck']['mail'] || node['rundeck']['email'] })
+    attribute(:email, kind_of: Hash, default: lazy { node['rundeck']['mail'] || node['rundeck']['email'] })
 
     # CLI usage
     attribute(:cli_user, kind_of: [String, FalseClass], default: 'cli')

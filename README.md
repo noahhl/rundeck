@@ -160,7 +160,7 @@ end
 * `external_host` – Hostname to use when creating links. *(default: node['rundeck']['external_host'])*
 * `external_port` – Port to use when creating links. *(default: node['rundeck']['external_port'])*
 * `external_scheme` – Scheme to use when creating links. Set to HTTPS if you are using a TLS proxy. *(default: node['rundeck']['external_scheme'])*
-* `email` – Email settings. *(option_collector, default: node['rundeck']['email'])*
+* `email` – Email settings. *(default: node['rundeck']['email'])*
 
 ##### CLI attributes
 
