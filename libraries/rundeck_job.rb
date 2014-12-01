@@ -84,8 +84,13 @@ class Chef
     def load_current_resource
       tempfile do |f|
         rd_jobs('list', '--project', new_resource.parent.project_name, '--name', new_resource.job_name, '--file', f.path, '--format', new_resource.format)
+        f.flush
         jobs = YAML.load_file(f.path)
-        job = jobs.select{|job| job['name'] == new_resource.job_name}.to_yaml
+        if !jobs || jobs.nil?
+          job = jobs
+        else
+          job = jobs.select { |job| job['name'] == new_resource.job_name }.to_yaml
+        end
         @current_resource = Resource::RundeckJob.new(new_resource.name)
         @current_resource.job_name(new_resource.job_name)
         @current_resource.format(new_resource.format)
