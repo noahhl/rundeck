@@ -17,7 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
+require 'poise'
 class Chef
   class Resource::Rundeck < Resource
     include Poise(container: true)
