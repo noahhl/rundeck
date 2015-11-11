@@ -27,6 +27,7 @@ class Chef
     attribute(:version, kind_of: String, default: lazy { node['rundeck']['version'] })
     attribute(:launcher_url, kind_of: String, default: lazy { node['rundeck']['launcher_url'] })
     attribute(:service_name, kind_of: String, default: 'rundeck')
+    attribute(:use_runit, equal_to: [true, false], default: true)
     # Paths
     attribute(:path, kind_of: String, default: lazy { node['rundeck']['path'] })
     attribute(:config_path, kind_of: String, default: lazy { node['rundeck']['config_path'] })
@@ -98,7 +99,7 @@ class Chef
           create_cli_user if new_resource.create_cli_user
           write_configs
           write_ssh_key if new_resource.ssh_key
-          configure_service
+          configure_service if new_resource.use_runit
         end
       end
     end
