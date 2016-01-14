@@ -42,6 +42,8 @@ class Chef
     attribute(:username, kind_of: String, default: lazy { parent.parent.ssh_user })
     attribute(:manual_nodes, kind_of: Array, default: [])
 
+    provides(:rundeck_node_source_file)
+
     def path
       ::File.join(parent.project_path, 'etc', 'resources.xml')
     end
@@ -82,6 +84,8 @@ class Chef
   end
 
   class Provider::RundeckNodeSourceFile < Provider::RundeckNodeSource
+    provides(:rundeck_node_source_file)
+
     def action_enable
       converge_by("write resources.xml for Rundeck project #{new_resource.parent.project_name}") do
         notifying_block do
